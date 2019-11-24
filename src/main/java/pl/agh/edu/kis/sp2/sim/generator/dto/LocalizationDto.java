@@ -44,4 +44,12 @@ public class LocalizationDto {
             return new LocalizationDto(this);
         }
     }
+
+    @Override
+    public String toString() {
+        return "LocalizationDto{" +
+                "latitude=" + latitude +
+                ", longitude=" + longitude +
+                '}';
+    }
 }
