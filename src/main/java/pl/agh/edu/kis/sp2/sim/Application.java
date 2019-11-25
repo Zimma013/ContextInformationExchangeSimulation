@@ -8,8 +8,10 @@ import org.jgrapht.io.ComponentNameProvider;
 import org.jgrapht.io.DOTExporter;
 import org.jgrapht.io.GraphExporter;
 import org.jgrapht.traverse.DepthFirstIterator;
+import pl.agh.edu.kis.sp2.sim.generator.AgentGenerator;
 import pl.agh.edu.kis.sp2.sim.generator.LocalizationGenerator;
 import pl.agh.edu.kis.sp2.sim.generator.graph.Edge;
+import pl.agh.edu.kis.sp2.sim.generator.graph.LocalizationVertex;
 import pl.agh.edu.kis.sp2.sim.generator.graph.Node;
 import pl.agh.edu.kis.sp2.sim.generator.wftr.Localization;
 
@@ -18,6 +20,7 @@ import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.rmi.server.ExportException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -53,15 +56,26 @@ public class Application {
 
 		//Graph<String, DefaultEdge> stringGraph = createStringGraph();
 		LocalizationGenerator localizationGenerator = new LocalizationGenerator();
-		Localization l1 = localizationGenerator.generateLocalization();
-		Localization l2 = localizationGenerator.generateLocalization();
-		SimpleDirectedWeightedGraph<Localization, DefaultWeightedEdge> localizationGraph = createGraph(l1,l2);
+		AgentGenerator agentGenerator = new AgentGenerator();
+
+		Localization localization1 = localizationGenerator.generateLocalization();
+		LocalizationVertex l1 = new LocalizationVertex.Builder()
+				.agentsInLocalization(agentGenerator.generateAgentsOnVertex(localization1, 30))
+				.localization(localization1)
+				.vertexId(1)
+				.build();;
+		LocalizationVertex l2 = new LocalizationVertex.Builder()
+				.agentsInLocalization(new ArrayList<>())
+				.localization(localizationGenerator.generateLocalization())
+				.vertexId(2)
+				.build();
+		SimpleDirectedWeightedGraph<LocalizationVertex, DefaultWeightedEdge> localizationGraph = createGraph(l1,l2);
 		// note undirected edges are printed as: {<v1>,<v2>}
 		System.out.println("-- toString output");
 		//System.out.println(stringGraph.toString());
 		System.out.println(localizationGraph.toString());
 		System.out.println();
-		GraphPath<Localization, DefaultWeightedEdge> shortest_path =   DijkstraShortestPath.findPathBetween(localizationGraph, l1, l2);
+		GraphPath<LocalizationVertex, DefaultWeightedEdge> shortest_path =   DijkstraShortestPath.findPathBetween(localizationGraph, l1, l2);
 		System.out.println(shortest_path);
 
 
@@ -191,14 +205,24 @@ public class Application {
 //
 //		return g;
 //	}
-	private static SimpleDirectedWeightedGraph<Localization,DefaultWeightedEdge> createGraph(Localization localization1,Localization localization2)
+	private static SimpleDirectedWeightedGraph<LocalizationVertex,DefaultWeightedEdge> createGraph(LocalizationVertex localizationV1,LocalizationVertex localizationV2)
 	{
-		SimpleDirectedWeightedGraph<Localization, DefaultWeightedEdge> g = new SimpleDirectedWeightedGraph<>(DefaultWeightedEdge.class);
+		SimpleDirectedWeightedGraph<LocalizationVertex, DefaultWeightedEdge> g = new SimpleDirectedWeightedGraph<>(DefaultWeightedEdge.class);
 		LocalizationGenerator localizationGenerator = new LocalizationGenerator();
-		Localization v1 = localization1;
-		Localization v2 = localization2;
-		Localization v3 = localizationGenerator.generateLocalization();
-		Localization v4 = localizationGenerator.generateLocalization();
+
+		LocalizationVertex v1 = localizationV1;
+
+		LocalizationVertex v2 = localizationV2;
+		LocalizationVertex v3 = new LocalizationVertex.Builder()
+				.agentsInLocalization(new ArrayList<>())
+				.localization(localizationGenerator.generateLocalization())
+				.vertexId(3)
+				.build();
+		LocalizationVertex v4 = new LocalizationVertex.Builder()
+				.agentsInLocalization(new ArrayList<>())
+				.localization(localizationGenerator.generateLocalization())
+				.vertexId(4)
+				.build();
 
 		// add the vertices
 		g.addVertex(v1);
