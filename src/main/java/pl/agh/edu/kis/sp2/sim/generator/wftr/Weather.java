@@ -1,21 +1,21 @@
-package pl.agh.edu.kis.sp2.sim.generator.dto;
+package pl.agh.edu.kis.sp2.sim.generator.wftr;
 
 import pl.agh.edu.kis.sp2.sim.generator.enumeration.FogAmount;
 import pl.agh.edu.kis.sp2.sim.generator.enumeration.WindDirection;
 
 import java.math.BigDecimal;
 
-public class WeatherDto {
+public class Weather {
     private BigDecimal wind;
     private WindDirection windDirection;
     private FogAmount fog;
     private BigDecimal rainAmount;
     private BigDecimal temperature;
 
-    public WeatherDto() {
+    public Weather() {
     }
 
-    private WeatherDto(Builder builder) {
+    private Weather(Builder builder) {
         wind = builder.wind;
         windDirection = builder.windDirection;
         fog = builder.fog;
@@ -78,8 +78,8 @@ public class WeatherDto {
             return this;
         }
 
-        public WeatherDto build() {
-            return new WeatherDto(this);
+        public Weather build() {
+            return new Weather(this);
         }
     }
 

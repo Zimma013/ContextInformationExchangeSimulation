@@ -1,16 +1,16 @@
-package pl.agh.edu.kis.sp2.sim.generator.dto;
+package pl.agh.edu.kis.sp2.sim.generator.wftr;
 
 import java.math.BigDecimal;
 
-public class LocalizationDto {
+public class Localization {
 
     private BigDecimal latitude;
     private BigDecimal longitude;
 
-    public LocalizationDto() {
+    public Localization() {
     }
 
-    private LocalizationDto(Builder builder) {
+    private Localization(Builder builder) {
         latitude = builder.latitude;
         longitude = builder.longitude;
     }
@@ -40,8 +40,8 @@ public class LocalizationDto {
             return this;
         }
 
-        public LocalizationDto build() {
-            return new LocalizationDto(this);
+        public Localization build() {
+            return new Localization(this);
         }
     }
 
