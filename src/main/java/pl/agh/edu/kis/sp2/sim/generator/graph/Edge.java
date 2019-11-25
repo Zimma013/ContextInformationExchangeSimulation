@@ -1,6 +1,9 @@
 package pl.agh.edu.kis.sp2.sim.generator.graph;
 
 public class Edge {
+    private Node destination;
+    private Node origin;
+    private double weight;
     public Node getDestination() {
         return destination;
     }
@@ -17,6 +20,11 @@ public class Edge {
         this.weight = weight;
     }
 
-    private Node destination;
-    private double weight;
+    public Node getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(Node origin) {
+        this.origin = origin;
+    }
 }
