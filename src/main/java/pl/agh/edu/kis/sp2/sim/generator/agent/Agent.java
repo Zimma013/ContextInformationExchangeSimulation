@@ -1,28 +1,61 @@
 package pl.agh.edu.kis.sp2.sim.generator.agent;
 
-import pl.agh.edu.kis.sp2.sim.generator.graph.Node;
+import pl.agh.edu.kis.sp2.sim.generator.graph.LocalizationVertex;
 import pl.agh.edu.kis.sp2.sim.generator.wftr.Localization;
+
+import java.util.List;
+import java.util.Set;
 
 public class Agent {
     private Localization currentLocalization;
+    private LocalizationVertex currentVertex;
     private int preferredRouteWeight;
+    private Set<LocalizationVertex> visitedVertexes;
 
     private Agent(Builder builder) {
-        currentLocalization = builder.currentLocalization;
+        setCurrentLocalization(builder.currentLocalization);
+        setCurrentVertex(builder.currentVertex);
         preferredRouteWeight = builder.preferredRouteWeight;
+        visitedVertexes = builder.visitedVertexes;
     }
 
     public Localization getCurrentLocalization() {
         return currentLocalization;
     }
 
+    public void setCurrentLocalization(Localization currentLocalization) {
+        this.currentLocalization = currentLocalization;
+    }
+
     public int getPreferredRouteWeight() {
         return preferredRouteWeight;
     }
 
+    public LocalizationVertex getCurrentVertex() {
+        return currentVertex;
+    }
+
+    public void setCurrentVertex(LocalizationVertex currentVertex) {
+        this.currentVertex = currentVertex;
+    }
+
+    public void addVertexToVisited(LocalizationVertex currentVertex) {
+        this.visitedVertexes.add(currentVertex);
+    }
+
+    public Set<LocalizationVertex> getVisitedVertexes() {
+        return visitedVertexes;
+    }
+
+    public void setVisitedVertexes(Set<LocalizationVertex> visitedVertexes) {
+        this.visitedVertexes = visitedVertexes;
+    }
+
     public static final class Builder {
         private Localization currentLocalization;
+        private LocalizationVertex currentVertex;
         private int preferredRouteWeight;
+        private Set<LocalizationVertex> visitedVertexes;
 
         public Builder() {
         }
@@ -32,8 +65,18 @@ public class Agent {
             return this;
         }
 
+        public Builder currentVertex(LocalizationVertex val) {
+            currentVertex = val;
+            return this;
+        }
+
         public Builder preferredRouteWeight(int val) {
             preferredRouteWeight = val;
+            return this;
+        }
+
+        public Builder visitedVertexes(Set<LocalizationVertex> val) {
+            visitedVertexes = val;
             return this;
         }
 

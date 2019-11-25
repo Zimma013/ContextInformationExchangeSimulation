@@ -9,6 +9,7 @@ public class LocalizationVertex {
     private int vertexId;
     private Localization localization;
     private List<Agent> agentsInLocalization;
+    private List<Agent> agentsMovingToLocalization;
 
     public LocalizationVertex() {
     }
@@ -17,6 +18,7 @@ public class LocalizationVertex {
         vertexId = builder.vertexId;
         localization = builder.localization;
         agentsInLocalization = builder.agentsInLocalization;
+        agentsMovingToLocalization = builder.agentsMovingToLocalization;
     }
 
     public int getVertexId() {
@@ -31,10 +33,41 @@ public class LocalizationVertex {
         return agentsInLocalization;
     }
 
+    public void setAgentsInLocalization(List<Agent> agentsInLocalization) {
+        this.agentsInLocalization = agentsInLocalization;
+    }
+
+    public void addAgentToLocation(Agent agent) {
+        agent.setCurrentLocalization(this.localization);
+        agentsInLocalization.add(agent);
+    }
+
+    public void removeAgentFromLocation(Agent agent) {
+        agentsInLocalization.remove(agent);
+    }
+
+    public List<Agent> getAgentsMovingToLocalization() {
+        return agentsMovingToLocalization;
+    }
+
+    public void setAgentsMovingToLocalization(List<Agent> agentsMovingToLocalization) {
+        this.agentsMovingToLocalization = agentsMovingToLocalization;
+    }
+
+    public void addAgentMovingToLocation(Agent agent, Localization localizationOffset) {
+        agent.setCurrentLocalization(this.localization);
+        agentsMovingToLocalization.add(agent);
+    }
+
+    public void removeAgentMovingFromLocation(Agent agent) {
+        agentsMovingToLocalization.remove(agent);
+    }
+
     public static final class Builder {
         private int vertexId;
         private Localization localization;
         private List<Agent> agentsInLocalization;
+        private List<Agent> agentsMovingToLocalization;
 
         public Builder() {
         }
@@ -51,6 +84,11 @@ public class LocalizationVertex {
 
         public Builder agentsInLocalization(List<Agent> val) {
             agentsInLocalization = val;
+            return this;
+        }
+
+        public Builder agentsMovingToLocalization(List<Agent> val) {
+            agentsMovingToLocalization = val;
             return this;
         }
 
