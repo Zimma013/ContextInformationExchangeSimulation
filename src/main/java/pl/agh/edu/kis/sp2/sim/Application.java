@@ -1,6 +1,8 @@
 package pl.agh.edu.kis.sp2.sim;
 
-import pl.agh.edu.kis.sp2.sim.generator.graph.WeightedGraph;
+import pl.agh.edu.kis.sp2.sim.generator.LocalizationGenerator;
+import pl.agh.edu.kis.sp2.sim.generator.graph.Edge;
+import pl.agh.edu.kis.sp2.sim.generator.graph.Node;
 
 public class Application {
 
@@ -11,17 +13,14 @@ public class Application {
 	    sim.showRandValues();
 	    sim.showRandValues();
 
-		int vertices = 6;
-		WeightedGraph.Graph graph = new WeightedGraph.Graph(vertices);
-		graph.addEgde(0, 1, 4);
-		graph.addEgde(0, 2, 3);
-		graph.addEgde(1, 3, 2);
-		graph.addEgde(1, 2, 5);
-		graph.addEgde(2, 3, 7);
-		graph.addEgde(3, 4, 2);
-		graph.addEgde(4, 0, 4);
-		graph.addEgde(4, 1, 4);
-		graph.addEgde(4, 5, 6);
-		graph.printGraph();
+	    LocalizationGenerator localizationGenerator = new LocalizationGenerator();
+	    Node a = new Node();
+	    a.setLocalization(localizationGenerator.generateLocalization());
+	    Node b = new Node();
+	    b.setLocalization(localizationGenerator.generateLocalization());
+		Edge e = new Edge();
+		e.setDestination(b);
+		e.setWeight(5);
+		a.addEdge(e);
     }
 }
