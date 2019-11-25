@@ -1,6 +1,7 @@
 package pl.agh.edu.kis.sp2.sim;
 
 import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.*;
 import org.jgrapht.io.ComponentNameProvider;
@@ -51,14 +52,17 @@ public class Application {
 		Node n = root;
 
 		//Graph<String, DefaultEdge> stringGraph = createStringGraph();
-		SimpleDirectedWeightedGraph<Localization, DefaultWeightedEdge> localizationGraph = createGraph();
+		LocalizationGenerator localizationGenerator = new LocalizationGenerator();
+		Localization l1 = localizationGenerator.generateLocalization();
+		Localization l2 = localizationGenerator.generateLocalization();
+		SimpleDirectedWeightedGraph<Localization, DefaultWeightedEdge> localizationGraph = createGraph(l1,l2);
 		// note undirected edges are printed as: {<v1>,<v2>}
 		System.out.println("-- toString output");
 		//System.out.println(stringGraph.toString());
 		System.out.println(localizationGraph.toString());
 		System.out.println();
-		//List shortest_path =   DijkstraShortestPath.findPathBetween(localizationGraph, "vertex1", "vertex5");
-		//System.out.println(shortest_path);
+		GraphPath<Localization, DefaultWeightedEdge> shortest_path =   DijkstraShortestPath.findPathBetween(localizationGraph, l1, l2);
+		System.out.println(shortest_path);
 
 
 		// create a graph based on URI objects
@@ -187,12 +191,12 @@ public class Application {
 //
 //		return g;
 //	}
-	private static SimpleDirectedWeightedGraph<Localization,DefaultWeightedEdge> createGraph()
+	private static SimpleDirectedWeightedGraph<Localization,DefaultWeightedEdge> createGraph(Localization localization1,Localization localization2)
 	{
 		SimpleDirectedWeightedGraph<Localization, DefaultWeightedEdge> g = new SimpleDirectedWeightedGraph<>(DefaultWeightedEdge.class);
 		LocalizationGenerator localizationGenerator = new LocalizationGenerator();
-		Localization v1 = localizationGenerator.generateLocalization();
-		Localization v2 = localizationGenerator.generateLocalization();
+		Localization v1 = localization1;
+		Localization v2 = localization2;
 		Localization v3 = localizationGenerator.generateLocalization();
 		Localization v4 = localizationGenerator.generateLocalization();
 
@@ -204,13 +208,19 @@ public class Application {
 
 		// add edges to create a circuit
 		DefaultWeightedEdge e1 = g.addEdge(v1, v2);
-		g.setEdgeWeight(e1, 1);
+		g.setEdgeWeight(e1, 20);
 		DefaultWeightedEdge e2 = g.addEdge(v2, v3);
 		g.setEdgeWeight(e2, 2);
 		DefaultWeightedEdge e3 = g.addEdge(v3, v4);
 		g.setEdgeWeight(e3, 3);
 		DefaultWeightedEdge e4 = g.addEdge(v4, v1);
 		g.setEdgeWeight(e4, 4);
+		DefaultWeightedEdge e5 = g.addEdge(v3, v2);
+		g.setEdgeWeight(e5, 4);
+		DefaultWeightedEdge e6 = g.addEdge(v1, v3);
+		g.setEdgeWeight(e6, 1);
+
+
 
 		return g;
 	}
