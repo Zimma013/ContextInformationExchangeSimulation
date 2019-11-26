@@ -24,8 +24,9 @@ public class AgentGenerator {
             agents.add(new Agent.Builder()
                     .currentLocalization(localizationVertex.getLocalization())
                     .currentVertex(localizationVertex)
-//                    .preferredRouteWeight(g.nextInt(5) + 1)
-                    .preferredRouteWeight(i)
+                    .preferredRouteWeight(g.nextInt(4) + 1)
+//                    .preferredRouteWeight(i)
+                    .wantsToMove(g.nextBoolean())
                     .visitedVertexes(visited)
                     .build());
         }

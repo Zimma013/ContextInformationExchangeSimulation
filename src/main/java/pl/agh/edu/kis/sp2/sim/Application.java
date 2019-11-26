@@ -1,7 +1,6 @@
 package pl.agh.edu.kis.sp2.sim;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
-import org.jgrapht.graph.SimpleDirectedWeightedGraph;
 import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
 import pl.agh.edu.kis.sp2.sim.generator.AgentGenerator;
@@ -13,8 +12,6 @@ import pl.agh.edu.kis.sp2.sim.generator.graph.LocalizationVertex;
 import pl.agh.edu.kis.sp2.sim.generator.wftr.Localization;
 
 import java.math.BigDecimal;
-import java.net.URISyntaxException;
-import java.rmi.server.ExportException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -26,7 +23,7 @@ import static pl.agh.edu.kis.sp2.sim.generator.GraphGenerator.createGraph;
 
 public class Application {
 
-    public static void main(String[] args) throws URISyntaxException, ExportException, org.jgrapht.io.ExportException {
+    public static void main(String[] args) {
         WeatherGenerator wg = new WeatherGenerator();
         System.out.println(wg.generateWeather());
         System.out.println(wg.generateWeather());
@@ -70,6 +67,7 @@ public class Application {
                 .vertexId(1)
                 .build();
         l1.setAgentsInLocalization(agentGenerator.generateAgentsOnVertex(l1, 30));
+
         LocalizationVertex l2 = new LocalizationVertex.Builder()
                 .agentsInLocalization(new ArrayList<>())
                 .agentsMovingToLocalization(new ArrayList<>())
@@ -95,12 +93,16 @@ public class Application {
                             .collect(Collectors.toList());
                     System.out.println("Target ------ " + localizationGraph.getEdgeTarget(edge));
                     for (Agent agent : agents) {
+//                        if (agent.isWantsToMove()) {
 
-                        if (agent.getVisitedVertexes().contains(localizationVertex)) {
-                            localizationGraph.getEdgeTarget(edge).addAgentMovingToLocation(agent, new Localization.Builder().latitude(new BigDecimal(0.00002D)).longitude(new BigDecimal(0.00002D)).build());
-                            agent.addVertexToVisited(localizationVertex);
-                            localizationVertex.removeAgentFromLocation(agent);
-                        }
+                            if (agent.getVisitedVertexes().contains(localizationVertex)) {
+                                localizationGraph.getEdgeTarget(edge).addAgentMovingToLocation(agent, new Localization.Builder().latitude(new BigDecimal(0.00002D)).longitude(new BigDecimal(0.00002D)).build());
+                                agent.addVertexToVisited(localizationVertex);
+                                localizationVertex.removeAgentFromLocation(agent);
+                            }
+
+//                        }
+//                        agent.setWantsToMove(new Random().nextBoolean());
                     }
                 /* {
 

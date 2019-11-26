@@ -3,7 +3,6 @@ package pl.agh.edu.kis.sp2.sim.generator.agent;
 import pl.agh.edu.kis.sp2.sim.generator.graph.LocalizationVertex;
 import pl.agh.edu.kis.sp2.sim.generator.wftr.Localization;
 
-import java.util.List;
 import java.util.Set;
 
 public class Agent {
@@ -11,12 +10,16 @@ public class Agent {
     private LocalizationVertex currentVertex;
     private int preferredRouteWeight;
     private Set<LocalizationVertex> visitedVertexes;
+    private boolean wantsToMove;
+
+
 
     private Agent(Builder builder) {
         setCurrentLocalization(builder.currentLocalization);
         setCurrentVertex(builder.currentVertex);
         preferredRouteWeight = builder.preferredRouteWeight;
-        visitedVertexes = builder.visitedVertexes;
+        setVisitedVertexes(builder.visitedVertexes);
+        wantsToMove = builder.wantsToMove;
     }
 
     public Localization getCurrentLocalization() {
@@ -51,11 +54,20 @@ public class Agent {
         this.visitedVertexes = visitedVertexes;
     }
 
+    public boolean isWantsToMove() {
+        return wantsToMove;
+    }
+
+    public void setWantsToMove(boolean wantsToMove) {
+        this.wantsToMove = wantsToMove;
+    }
+
     public static final class Builder {
         private Localization currentLocalization;
         private LocalizationVertex currentVertex;
         private int preferredRouteWeight;
         private Set<LocalizationVertex> visitedVertexes;
+        private boolean wantsToMove;
 
         public Builder() {
         }
@@ -77,6 +89,11 @@ public class Agent {
 
         public Builder visitedVertexes(Set<LocalizationVertex> val) {
             visitedVertexes = val;
+            return this;
+        }
+
+        public Builder wantsToMove(boolean val) {
+            wantsToMove = val;
             return this;
         }
 
