@@ -35,11 +35,11 @@ public class GraphGenerator {
                     .edges(new ArrayList<>())
                     .localization(localizationGenerator.generateLocalization())
                     .build();
-
+            final Random random = new Random();
             rootNode.addEdge(new Edge.Builder()
                     .destination(node)
                     .origin(rootNode)
-                    .weight(5)
+                    .weight(random.nextInt(4)+1)
                     .build());
 
             if (subLevelCount > 1) {

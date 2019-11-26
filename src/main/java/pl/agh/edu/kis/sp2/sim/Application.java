@@ -12,6 +12,7 @@ import pl.agh.edu.kis.sp2.sim.generator.AgentGenerator;
 import pl.agh.edu.kis.sp2.sim.generator.LocalizationGenerator;
 import pl.agh.edu.kis.sp2.sim.generator.WeatherGenerator;
 import pl.agh.edu.kis.sp2.sim.generator.agent.Agent;
+import pl.agh.edu.kis.sp2.sim.generator.enumeration.Avalanche;
 import pl.agh.edu.kis.sp2.sim.generator.graph.Edge;
 import pl.agh.edu.kis.sp2.sim.generator.graph.LocalizationVertex;
 import pl.agh.edu.kis.sp2.sim.generator.graph.Node;
@@ -38,6 +39,7 @@ public class Application {
         System.out.println(wg.generateWeather());
         System.out.println(wg.generateWeather());
         System.out.println(wg.generateWeather());
+        System.out.println(Avalanche.getRandomAvalanche());
 //	    Simulator sim = new Simulator();
 
 //	    sim.showRandValues();
