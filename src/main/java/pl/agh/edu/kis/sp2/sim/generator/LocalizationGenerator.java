@@ -16,10 +16,10 @@ public class LocalizationGenerator {
 
     public Localization generateLocalization() {
         return new Localization.Builder()
-                .latitude(new BigDecimal(coordinateRandomGenerator.nextDouble() + 50D)
-                        .setScale(7, RoundingMode.HALF_UP))
-                .longitude(new BigDecimal(coordinateRandomGenerator.nextDouble() + 20D)
-                        .setScale(7, RoundingMode.HALF_UP))
+                .latitude(new BigDecimal(49.2758701 - (coordinateRandomGenerator.nextDouble()/25) /** (coordinateRandomGenerator.nextBoolean() ? 1 : -1)*/)
+                        .setScale(10, RoundingMode.HALF_UP))
+                .longitude(new BigDecimal(19.9038364 - coordinateRandomGenerator.nextDouble()/25)
+                        .setScale(10, RoundingMode.HALF_UP))
                 .build();
     }
 }
