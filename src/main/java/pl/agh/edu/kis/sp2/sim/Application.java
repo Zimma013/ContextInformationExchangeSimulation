@@ -1,27 +1,18 @@
 package pl.agh.edu.kis.sp2.sim;
 
-import org.jgrapht.Graph;
-import org.jgrapht.GraphPath;
-import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
-import org.jgrapht.graph.*;
-import org.jgrapht.io.ComponentNameProvider;
-import org.jgrapht.io.DOTExporter;
-import org.jgrapht.io.GraphExporter;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleDirectedWeightedGraph;
+import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
 import pl.agh.edu.kis.sp2.sim.generator.AgentGenerator;
 import pl.agh.edu.kis.sp2.sim.generator.LocalizationGenerator;
 import pl.agh.edu.kis.sp2.sim.generator.WeatherGenerator;
 import pl.agh.edu.kis.sp2.sim.generator.agent.Agent;
 import pl.agh.edu.kis.sp2.sim.generator.enumeration.Avalanche;
-import pl.agh.edu.kis.sp2.sim.generator.graph.Edge;
 import pl.agh.edu.kis.sp2.sim.generator.graph.LocalizationVertex;
-import pl.agh.edu.kis.sp2.sim.generator.graph.Node;
 import pl.agh.edu.kis.sp2.sim.generator.wftr.Localization;
 
-import java.io.StringWriter;
-import java.io.Writer;
 import java.math.BigDecimal;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.rmi.server.ExportException;
 import java.util.ArrayList;
@@ -29,6 +20,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static pl.agh.edu.kis.sp2.sim.generator.GraphGenerator.createGraph;
 
 
 public class Application {
@@ -83,18 +76,7 @@ public class Application {
                 .localization(localizationGenerator.generateLocalization())
                 .vertexId(2)
                 .build();
-        SimpleDirectedWeightedGraph<LocalizationVertex, DefaultWeightedEdge> localizationGraph = createGraph(l1,l2);
-        // note undirected edges are printed as: {<v1>,<v2>}
-        System.out.println("-- toString output");
-        System.out.println("-- (1,2):20");
-        System.out.println("-- (2,3):2");
-        System.out.println("-- (3,4):3");
-        System.out.println("-- (1,4):4");
-        System.out.println("-- (3,2):4");
-        System.out.println("-- (1,3):1");
-        //System.out.println(stringGraph.toString());
-//		System.out.println(localizationGraph.toString());
-        System.out.println();
+        SimpleWeightedGraph<LocalizationVertex, DefaultWeightedEdge> localizationGraph = createGraph(l1,l2);
 
 
         for(int i = 0; i < 3; i++) {
@@ -137,57 +119,4 @@ public class Application {
             System.out.println();
         }
     }
-
-    /**
-     * Creates a toy directed graph based on URI objects that represents link structure.
-     *
-     * @return a graph based on URI objects.
-     */
-
-    private static SimpleDirectedWeightedGraph<LocalizationVertex,DefaultWeightedEdge> createGraph(LocalizationVertex localizationV1,LocalizationVertex localizationV2)
-    {
-        SimpleDirectedWeightedGraph<LocalizationVertex, DefaultWeightedEdge> g = new SimpleDirectedWeightedGraph<>(DefaultWeightedEdge.class);
-        LocalizationGenerator localizationGenerator = new LocalizationGenerator();
-
-        LocalizationVertex v1 = localizationV1;
-
-        LocalizationVertex v2 = localizationV2;
-        LocalizationVertex v3 = new LocalizationVertex.Builder()
-                .agentsInLocalization(new ArrayList<>())
-                .agentsMovingToLocalization(new ArrayList<>())
-                .localization(localizationGenerator.generateLocalization())
-                .vertexId(3)
-                .build();
-        LocalizationVertex v4 = new LocalizationVertex.Builder()
-                .agentsInLocalization(new ArrayList<>())
-                .agentsMovingToLocalization(new ArrayList<>())
-                .localization(localizationGenerator.generateLocalization())
-                .vertexId(4)
-                .build();
-
-        // add the vertices
-        g.addVertex(v1);
-        g.addVertex(v2);
-        g.addVertex(v3);
-        g.addVertex(v4);
-
-        // add edges to create a circuit
-        DefaultWeightedEdge e1 = g.addEdge(v1, v2);
-        g.setEdgeWeight(e1, 20);
-        DefaultWeightedEdge e2 = g.addEdge(v2, v3);
-        g.setEdgeWeight(e2, 2);
-        DefaultWeightedEdge e3 = g.addEdge(v3, v4);
-        g.setEdgeWeight(e3, 3);
-        DefaultWeightedEdge e4 = g.addEdge(v1, v4);
-        g.setEdgeWeight(e4, 4);
-        DefaultWeightedEdge e5 = g.addEdge(v3, v2);
-        g.setEdgeWeight(e5, 4);
-        DefaultWeightedEdge e6 = g.addEdge(v1, v3);
-        g.setEdgeWeight(e6, 1);
-
-
-
-        return g;
-    }
-
 }

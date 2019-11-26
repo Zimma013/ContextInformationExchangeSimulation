@@ -1,107 +1,53 @@
 package pl.agh.edu.kis.sp2.sim.generator;
 
-import pl.agh.edu.kis.sp2.sim.generator.graph.Edge;
-import pl.agh.edu.kis.sp2.sim.generator.graph.Node;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleWeightedGraph;
+import pl.agh.edu.kis.sp2.sim.generator.graph.LocalizationVertex;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public class GraphGenerator {
-    private LocalizationGenerator localizationGenerator;
+    public static SimpleWeightedGraph<LocalizationVertex, DefaultWeightedEdge> createGraph(LocalizationVertex localizationV1, LocalizationVertex localizationV2)
+    {
+        SimpleWeightedGraph<LocalizationVertex, DefaultWeightedEdge> g = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
+        LocalizationGenerator localizationGenerator = new LocalizationGenerator();
 
-    public GraphGenerator() {
-        this.localizationGenerator = new LocalizationGenerator();
-    }
+        LocalizationVertex v1 = localizationV1;
 
-    //returns root node
-    public Node generateGraphLevel(Node rootNode, int nodeCount, int subLevelCount) {
+        LocalizationVertex v2 = localizationV2;
+        LocalizationVertex v3 = new LocalizationVertex.Builder()
+                .agentsInLocalization(new ArrayList<>())
+                .agentsMovingToLocalization(new ArrayList<>())
+                .localization(localizationGenerator.generateLocalization())
+                .vertexId(3)
+                .build();
+        LocalizationVertex v4 = new LocalizationVertex.Builder()
+                .agentsInLocalization(new ArrayList<>())
+                .agentsMovingToLocalization(new ArrayList<>())
+                .localization(localizationGenerator.generateLocalization())
+                .vertexId(4)
+                .build();
 
-        if (rootNode == null) {
-            rootNode = new Node.Builder()
-                    .localization(localizationGenerator.generateLocalization())
-                    .edges(new ArrayList<>())
-                    .build();
+        // add the vertices
+        g.addVertex(v1);
+        g.addVertex(v2);
+        g.addVertex(v3);
+        g.addVertex(v4);
 
-            nodeCount--;
-        }
+        // add edges to create a circuit
+        DefaultWeightedEdge e1 = g.addEdge(v1, v2);
+        g.setEdgeWeight(e1, 20);
+        DefaultWeightedEdge e2 = g.addEdge(v2, v3);
+        g.setEdgeWeight(e2, 2);
+        DefaultWeightedEdge e3 = g.addEdge(v3, v4);
+        g.setEdgeWeight(e3, 3);
+        DefaultWeightedEdge e4 = g.addEdge(v1, v4);
+        g.setEdgeWeight(e4, 4);
+        DefaultWeightedEdge e5 = g.addEdge(v1, v3);
+        g.setEdgeWeight(e5, 1);
 
-        if (nodeCount <= 0) {
-            return rootNode;
-        }
 
-        for (int i = 0; i < nodeCount ; i++) {
 
-            Node node = new Node.Builder()
-                    .edges(new ArrayList<>())
-                    .localization(localizationGenerator.generateLocalization())
-                    .build();
-            final Random random = new Random();
-            rootNode.addEdge(new Edge.Builder()
-                    .destination(node)
-                    .origin(rootNode)
-                    .weight(random.nextInt(4)+1)
-                    .build());
-
-            if (subLevelCount > 1) {
-                subLevelCount--;
-                generateGraphLevel(node, nodeCount, subLevelCount);
-            }
-        }
-
-        return rootNode;
-    }
-
-    public Node generateRandomGraphLevel(Node rootNode, int nodeCountBoundary, int subLevelCountBoundary) {
-
-        Random g = new Random();
-        if (nodeCountBoundary <= 0) {
-            nodeCountBoundary = 1;
-        }
-        int nodeCount = g.nextInt(nodeCountBoundary) + 1;
-
-        if (rootNode == null) {
-            rootNode = new Node.Builder()
-                    .localization(localizationGenerator.generateLocalization())
-                    .edges(new ArrayList<>())
-                    .build();
-
-            nodeCount--;
-        }
-
-        if (nodeCount <= 0) {
-            return rootNode;
-        }
-
-        System.out.println("Random -- (nodeCount) ----- " + nodeCount);
-        for (int i = 0; i < nodeCount ; i++) {
-            int subLevelCount = g.nextInt(subLevelCountBoundary);
-            int nextNodeCount = g.nextInt(nodeCountBoundary);
-
-            System.out.println("Random -- (nextNodeCount) ----- " + nextNodeCount);
-            System.out.println("Random -- (subLevelCount) ----- " + subLevelCount);
-
-            Node node = new Node.Builder()
-                    .edges(new ArrayList<>())
-                    .localization(localizationGenerator.generateLocalization())
-                    .build();
-
-            rootNode.addEdge(new Edge.Builder()
-                    .destination(node)
-                    .origin(rootNode)
-                    .weight(5)
-                    .build());
-
-            /*node.addEdge(new Edge.Builder()
-                    .destination(rootNode)
-                    .origin(node)
-                    .weight(5D)
-                    .build());*/
-
-            if (subLevelCount > 1) {
-                generateRandomGraphLevel(node, nextNodeCount, subLevelCount);
-            }
-        }
-
-        return rootNode;
+        return g;
     }
 }
