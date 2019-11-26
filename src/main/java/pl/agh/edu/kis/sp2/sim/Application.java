@@ -10,6 +10,7 @@ import org.jgrapht.io.GraphExporter;
 import org.jgrapht.traverse.DepthFirstIterator;
 import pl.agh.edu.kis.sp2.sim.generator.AgentGenerator;
 import pl.agh.edu.kis.sp2.sim.generator.LocalizationGenerator;
+import pl.agh.edu.kis.sp2.sim.generator.WeatherGenerator;
 import pl.agh.edu.kis.sp2.sim.generator.agent.Agent;
 import pl.agh.edu.kis.sp2.sim.generator.graph.Edge;
 import pl.agh.edu.kis.sp2.sim.generator.graph.LocalizationVertex;
@@ -32,6 +33,11 @@ import java.util.stream.Collectors;
 public class Application {
 
     public static void main(String[] args) throws URISyntaxException, ExportException, org.jgrapht.io.ExportException {
+        WeatherGenerator wg = new WeatherGenerator();
+        System.out.println(wg.generateWeather());
+        System.out.println(wg.generateWeather());
+        System.out.println(wg.generateWeather());
+        System.out.println(wg.generateWeather());
 //	    Simulator sim = new Simulator();
 
 //	    sim.showRandValues();

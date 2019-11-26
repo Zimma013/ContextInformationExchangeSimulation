@@ -1,16 +1,17 @@
 package pl.agh.edu.kis.sp2.sim.generator.wftr;
 
-import pl.agh.edu.kis.sp2.sim.generator.enumeration.FogAmount;
-import pl.agh.edu.kis.sp2.sim.generator.enumeration.WindDirection;
+import pl.agh.edu.kis.sp2.sim.generator.enumeration.*;
 
 import java.math.BigDecimal;
+import java.util.Random;
 
 public class Weather {
-    private BigDecimal wind;
+
+    private Wind wind;
     private WindDirection windDirection;
-    private FogAmount fog;
-    private BigDecimal rainAmount;
-    private BigDecimal temperature;
+    private Fog fog;
+    private Rain rainAmount;
+    private Temperature temperature;
 
     public Weather() {
     }
@@ -23,7 +24,7 @@ public class Weather {
         temperature = builder.temperature;
     }
 
-    public BigDecimal getWind() {
+    public Wind getWind() {
         return wind;
     }
 
@@ -31,29 +32,29 @@ public class Weather {
         return windDirection;
     }
 
-    public FogAmount getFog() {
+    public Fog getFog() {
         return fog;
     }
 
-    public BigDecimal getRainAmount() {
+    public Rain getRainAmount() {
         return rainAmount;
     }
 
-    public BigDecimal getTemperature() {
+    public Temperature getTemperature() {
         return temperature;
     }
 
     public static final class Builder {
-        private BigDecimal wind;
+        private Wind wind;
         private WindDirection windDirection;
-        private FogAmount fog;
-        private BigDecimal rainAmount;
-        private BigDecimal temperature;
+        private Fog fog;
+        private Rain rainAmount;
+        private Temperature temperature;
 
         public Builder() {
         }
 
-        public Builder wind(BigDecimal val) {
+        public Builder wind(Wind val) {
             wind = val;
             return this;
         }
@@ -63,17 +64,17 @@ public class Weather {
             return this;
         }
 
-        public Builder fog(FogAmount val) {
+        public Builder fog(Fog val) {
             fog = val;
             return this;
         }
 
-        public Builder rainAmount(BigDecimal val) {
+        public Builder rainAmount(Rain val) {
             rainAmount = val;
             return this;
         }
 
-        public Builder temperature(BigDecimal val) {
+        public Builder temperature(Temperature val) {
             temperature = val;
             return this;
         }
