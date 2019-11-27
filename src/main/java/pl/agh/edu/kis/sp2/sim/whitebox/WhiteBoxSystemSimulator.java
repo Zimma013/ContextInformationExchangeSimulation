@@ -1,4 +1,4 @@
-package pl.agh.edu.kis.sp2.sim;
+package pl.agh.edu.kis.sp2.sim.whitebox;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
@@ -6,6 +6,7 @@ import org.jgrapht.traverse.DepthFirstIterator;
 import pl.agh.edu.kis.sp2.sim.generator.agent.Agent;
 import pl.agh.edu.kis.sp2.sim.generator.graph.LocalizationVertex;
 import pl.agh.edu.kis.sp2.sim.generator.wftr.Localization;
+import pl.agh.edu.kis.sp2.sim.generator.wftr.WeatherSensor;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -21,14 +22,11 @@ public class WhiteBoxSystemSimulator {
 	private LocalizationVertex rootVertex;
 	private int simulatedWeatherConditionsMode;
 	private double localizationDataRedundancyCoefficient;
+	private List<WeatherSensor> weatherSensors;
 
-	private WhiteBoxSystemSimulator(Builder builder) {
-		population = builder.population;
-		mountainRoutesGraph = builder.mountainRoutesGraph;
-		rootVertex = builder.rootVertex;
-		simulatedWeatherConditionsMode = builder.simulatedWeatherConditionsMode;
-		localizationDataRedundancyCoefficient = builder.localizationDataRedundancyCoefficient;
+	WhiteBoxSystemSimulator() {
 	}
+
 
 	public void simulate(int iterationsCount) {
 
@@ -101,43 +99,35 @@ public class WhiteBoxSystemSimulator {
 		return localizationDataRedundancyCoefficient;
 	}
 
-	public static final class Builder {
-		private List<Agent> population;
-		private SimpleWeightedGraph<LocalizationVertex, DefaultWeightedEdge> mountainRoutesGraph;
-		private LocalizationVertex rootVertex;
-		private int simulatedWeatherConditionsMode;
-		private double localizationDataRedundancyCoefficient;
+	public List<WeatherSensor> getWeatherSensors() {
+		return weatherSensors;
+	}
 
-		public Builder() {
-		}
 
-		public Builder population(List<Agent> val) {
-			population = val;
-			return this;
-		}
+	// SETTERS
 
-		public Builder mountainRoutesGraph(SimpleWeightedGraph<LocalizationVertex, DefaultWeightedEdge> val) {
-			mountainRoutesGraph = val;
-			return this;
-		}
 
-		public Builder rootVertex(LocalizationVertex val) {
-			rootVertex = val;
-			return this;
-		}
+	public void setPopulation(List<Agent> population) {
+		this.population = population;
+	}
 
-		public Builder simulatedWeatherConditionsMode(int val) {
-			simulatedWeatherConditionsMode = val;
-			return this;
-		}
+	public void setMountainRoutesGraph(SimpleWeightedGraph<LocalizationVertex, DefaultWeightedEdge> mountainRoutesGraph) {
+		this.mountainRoutesGraph = mountainRoutesGraph;
+	}
 
-		public Builder localizationDataRedundancyCoefficient(double val) {
-			localizationDataRedundancyCoefficient = val;
-			return this;
-		}
+	public void setRootVertex(LocalizationVertex rootVertex) {
+		this.rootVertex = rootVertex;
+	}
 
-		public WhiteBoxSystemSimulator build() {
-			return new WhiteBoxSystemSimulator(this);
-		}
+	public void setSimulatedWeatherConditionsMode(int simulatedWeatherConditionsMode) {
+		this.simulatedWeatherConditionsMode = simulatedWeatherConditionsMode;
+	}
+
+	public void setLocalizationDataRedundancyCoefficient(double localizationDataRedundancyCoefficient) {
+		this.localizationDataRedundancyCoefficient = localizationDataRedundancyCoefficient;
+	}
+
+	public void setWeatherSensors(List<WeatherSensor> weatherSensors) {
+		this.weatherSensors = weatherSensors;
 	}
 }
