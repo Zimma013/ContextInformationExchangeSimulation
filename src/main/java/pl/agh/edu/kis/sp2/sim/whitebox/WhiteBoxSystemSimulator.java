@@ -7,6 +7,7 @@ import pl.agh.edu.kis.sp2.sim.generator.agent.Agent;
 import pl.agh.edu.kis.sp2.sim.generator.graph.LocalizationVertex;
 import pl.agh.edu.kis.sp2.sim.generator.wftr.Localization;
 import pl.agh.edu.kis.sp2.sim.generator.wftr.WeatherSensor;
+import pl.agh.edu.kis.sp2.sim.util.LocalizationDistanceUtility;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -47,17 +48,27 @@ public class WhiteBoxSystemSimulator {
 					for (Agent agent : agents) {
 //                        if (agent.isWantsToMove()) {
 
-						if (agent.getVisitedVertexes().contains(localizationVertex)) {
-							mountainRoutesGraph.getEdgeTarget(edge).addAgentMovingToLocation(agent, new Localization.Builder().latitude(new BigDecimal(0.00002D)).longitude(new BigDecimal(0.00002D)).build());
+						// Something is wrong here, besides TPing to next vertex
+//						if (agent.getVisitedVertexes().contains(localizationVertex)) {
+							LocalizationVertex destination = mountainRoutesGraph.getEdgeTarget(edge);
+									destination.addAgentMovingToLocation(agent, new Localization.Builder().latitude(new BigDecimal(0.00002D)).longitude(new BigDecimal(0.00002D)).build());
+							agent.setDestinationVertex(destination);
+							agent.setDistanceToDestination(
+									LocalizationDistanceUtility.distance(
+											localizationVertex.getLocalization().getLatitude().doubleValue(), localizationVertex.getLocalization().getLongitude().doubleValue(),
+											destination.getLocalization().getLatitude().doubleValue(), destination.getLocalization().getLongitude().doubleValue(),
+											'K'));
 							agent.addVertexToVisited(localizationVertex);
 							localizationVertex.removeAgentFromLocation(agent);
-						}
+//						}
 
 //                        }
 //                        agent.setWantsToMove(new Random().nextBoolean());
 					}
 				});
 			}
+
+			movePopulationWithConstSpeed(100);
 
 			finishPopulationMovement();
 
@@ -66,11 +77,25 @@ public class WhiteBoxSystemSimulator {
 		}
 	}
 
+	private void movePopulationWithConstSpeed(int movementRate) {
+		for (LocalizationVertex vertex : mountainRoutesGraph.vertexSet()) {
+			vertex.getAgentsMovingToLocalization()
+					.forEach(agent ->
+							agent.setDistanceToDestination(LocalizationDistanceUtility.distance(
+							agent.getCurrentVertex().getLocalization().getLatitude().doubleValue(), agent.getCurrentVertex().getLocalization().getLongitude().doubleValue(),
+							agent.getDestinationVertex().getLocalization().getLatitude().doubleValue(), agent.getDestinationVertex().getLocalization().getLongitude().doubleValue(),
+							'K') / movementRate)
+					);
+		}
+	}
+
 	private void finishPopulationMovement() {
 		Iterator<LocalizationVertex> iterator = new DepthFirstIterator<>(this.mountainRoutesGraph, rootVertex);
 		while (iterator.hasNext()) {
 			LocalizationVertex localizationVertex = iterator.next();
-			localizationVertex.getAgentsInLocalization().addAll(localizationVertex.getAgentsMovingToLocalization());
+			localizationVertex.getAgentsInLocalization().addAll(localizationVertex.getAgentsMovingToLocalization().stream()
+					.filter(agent -> agent.getDistanceToDestination() <= 0D)
+					.collect(Collectors.toList()));
 			localizationVertex.setAgentsMovingToLocalization(new ArrayList<>());
 		}
 	}
@@ -107,27 +132,27 @@ public class WhiteBoxSystemSimulator {
 	// SETTERS
 
 
-	public void setPopulation(List<Agent> population) {
+	void setPopulation(List<Agent> population) {
 		this.population = population;
 	}
 
-	public void setMountainRoutesGraph(SimpleWeightedGraph<LocalizationVertex, DefaultWeightedEdge> mountainRoutesGraph) {
+	void setMountainRoutesGraph(SimpleWeightedGraph<LocalizationVertex, DefaultWeightedEdge> mountainRoutesGraph) {
 		this.mountainRoutesGraph = mountainRoutesGraph;
 	}
 
-	public void setRootVertex(LocalizationVertex rootVertex) {
+	void setRootVertex(LocalizationVertex rootVertex) {
 		this.rootVertex = rootVertex;
 	}
 
-	public void setSimulatedWeatherConditionsMode(int simulatedWeatherConditionsMode) {
+	void setSimulatedWeatherConditionsMode(int simulatedWeatherConditionsMode) {
 		this.simulatedWeatherConditionsMode = simulatedWeatherConditionsMode;
 	}
 
-	public void setLocalizationDataRedundancyCoefficient(double localizationDataRedundancyCoefficient) {
+	void setLocalizationDataRedundancyCoefficient(double localizationDataRedundancyCoefficient) {
 		this.localizationDataRedundancyCoefficient = localizationDataRedundancyCoefficient;
 	}
 
-	public void setWeatherSensors(List<WeatherSensor> weatherSensors) {
+	void setWeatherSensors(List<WeatherSensor> weatherSensors) {
 		this.weatherSensors = weatherSensors;
 	}
 }

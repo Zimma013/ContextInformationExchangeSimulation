@@ -8,18 +8,20 @@ import java.util.Set;
 public class Agent {
     private Localization currentLocalization;
     private LocalizationVertex currentVertex;
+    private LocalizationVertex destinationVertex;
     private int preferredRouteWeight;
     private Set<LocalizationVertex> visitedVertexes;
     private boolean wantsToMove;
-
+    private double distanceToDestination;
 
 
     private Agent(Builder builder) {
         setCurrentLocalization(builder.currentLocalization);
         setCurrentVertex(builder.currentVertex);
-        preferredRouteWeight = builder.preferredRouteWeight;
+        setDestinationVertex(builder.destinationVertex);
+        setPreferredRouteWeight(builder.preferredRouteWeight);
         setVisitedVertexes(builder.visitedVertexes);
-        wantsToMove = builder.wantsToMove;
+        setWantsToMove(builder.wantsToMove);
     }
 
     public Localization getCurrentLocalization() {
@@ -62,9 +64,30 @@ public class Agent {
         this.wantsToMove = wantsToMove;
     }
 
-    public static final class Builder {
+    public void setDestinationVertex(LocalizationVertex destinationVertex) {
+        this.destinationVertex = destinationVertex;
+    }
+
+    public void setPreferredRouteWeight(int preferredRouteWeight) {
+        this.preferredRouteWeight = preferredRouteWeight;
+    }
+
+	public LocalizationVertex getDestinationVertex() {
+		return destinationVertex;
+	}
+
+	public double getDistanceToDestination() {
+		return distanceToDestination;
+	}
+
+	public void setDistanceToDestination(double distanceToDestination) {
+		this.distanceToDestination = distanceToDestination;
+	}
+
+	public static final class Builder {
         private Localization currentLocalization;
         private LocalizationVertex currentVertex;
+        private LocalizationVertex destinationVertex;
         private int preferredRouteWeight;
         private Set<LocalizationVertex> visitedVertexes;
         private boolean wantsToMove;
@@ -79,6 +102,11 @@ public class Agent {
 
         public Builder currentVertex(LocalizationVertex val) {
             currentVertex = val;
+            return this;
+        }
+
+        public Builder destinationVertex(LocalizationVertex val) {
+            destinationVertex = val;
             return this;
         }
 
