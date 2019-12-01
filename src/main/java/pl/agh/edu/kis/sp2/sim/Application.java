@@ -2,6 +2,7 @@ package pl.agh.edu.kis.sp2.sim;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
+import pl.agh.edu.kis.sp2.sim.excel.Data;
 import pl.agh.edu.kis.sp2.sim.generator.AgentGenerator;
 import pl.agh.edu.kis.sp2.sim.generator.GraphGenerator;
 import pl.agh.edu.kis.sp2.sim.generator.LocalizationGenerator;
@@ -11,6 +12,7 @@ import pl.agh.edu.kis.sp2.sim.generator.graph.LocalizationVertex;
 import pl.agh.edu.kis.sp2.sim.whitebox.WhiteBoxSystemSimulator;
 import pl.agh.edu.kis.sp2.sim.whitebox.WhiteBoxSystemSimulatorConfigurator;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +20,7 @@ import java.util.List;
 
 public class Application {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         int simulatedWeatherConditionsMode = 1;
 
@@ -44,6 +46,12 @@ public class Application {
                 .build();
 
         simulator.simulate(200);
+        Data excelWriter = new Data(1,2,3,4,5);
+
+        List<Data> listData = excelWriter.getListData();
+        String excelFilePath = "NiceContextData.xls";
+
+        excelWriter.writeExcel(listData, excelFilePath);
 
     }
 }
