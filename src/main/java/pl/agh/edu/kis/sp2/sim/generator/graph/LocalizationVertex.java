@@ -103,6 +103,7 @@ public class LocalizationVertex {
                 "vertexId=" + vertexId +
                 ", localization=" + localization +
                 ", agentsInLocalization=" + agentsInLocalization.size() +
+                ", agentsMovingToLocalization=" + agentsMovingToLocalization.size() +
                 '}';
     }
 }

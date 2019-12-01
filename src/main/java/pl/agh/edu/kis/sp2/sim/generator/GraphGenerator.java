@@ -24,7 +24,7 @@ public class GraphGenerator {
                     .agentsInLocalization(new ArrayList<>())
                     .agentsMovingToLocalization(new ArrayList<>())
                     .localization(localizationGenerator.generateLocalization())
-                    .vertexId(rootVertex.getVertexId() + i)
+                    .vertexId(rootVertex.getVertexId() + i + 1)
                     .build());
         }
 
@@ -43,11 +43,17 @@ public class GraphGenerator {
             for (int i = 0; i < edgeCount; i++) {
 
                 // Random generates random int from 0 inclusive to bounds exclusive, so if used as a random index generator of list it'll always remain within array index bounds
-                DefaultWeightedEdge edge = g.addEdge(vertex, verticesWithoutCurrent.get(gen.nextInt(verticesWithoutCurrent.size())));
+                DefaultWeightedEdge edge = null;
 
                 // If edge was added properly (did'nt exist previously)
-                if (edge != null) {
-                    g.setEdgeWeight(edge, gen.nextInt(maxWeight) + 1);
+                while (edge == null) {
+                    edge = g.addEdge(vertex, verticesWithoutCurrent.get(gen.nextInt(verticesWithoutCurrent.size())));
+                    if (edge != null) {
+                        int weight = gen.nextInt(maxWeight) + 1;
+                        g.setEdgeWeight(edge, weight);
+
+                        System.out.println("Weight of edge --- " + edge.toString() + " --------- w: " + weight);
+                    }
                 }
             }
 

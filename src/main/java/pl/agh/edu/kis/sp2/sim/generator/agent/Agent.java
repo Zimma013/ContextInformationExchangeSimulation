@@ -6,6 +6,7 @@ import pl.agh.edu.kis.sp2.sim.generator.wftr.Localization;
 import java.util.Set;
 
 public class Agent {
+    private Long agentId;
     private Localization currentLocalization;
     private LocalizationVertex currentVertex;
     private LocalizationVertex destinationVertex;
@@ -13,15 +14,25 @@ public class Agent {
     private Set<LocalizationVertex> visitedVertexes;
     private boolean wantsToMove;
     private double distanceToDestination;
+    private Long groupId;
+    private Agent leader;
 
 
     private Agent(Builder builder) {
+        agentId = builder.agentId;
         setCurrentLocalization(builder.currentLocalization);
         setCurrentVertex(builder.currentVertex);
         setDestinationVertex(builder.destinationVertex);
         setPreferredRouteWeight(builder.preferredRouteWeight);
         setVisitedVertexes(builder.visitedVertexes);
         setWantsToMove(builder.wantsToMove);
+        setDistanceToDestination(builder.distanceToDestination);
+        groupId = builder.groupId;
+        leader = builder.leader;
+    }
+
+    public Long getAgentId() {
+        return agentId;
     }
 
     public Localization getCurrentLocalization() {
@@ -84,13 +95,25 @@ public class Agent {
 		this.distanceToDestination = distanceToDestination;
 	}
 
-	public static final class Builder {
+    public Long getGroupId() {
+        return groupId;
+    }
+
+    public Agent getLeader() {
+        return leader;
+    }
+
+    public static final class Builder {
         private Localization currentLocalization;
         private LocalizationVertex currentVertex;
         private LocalizationVertex destinationVertex;
         private int preferredRouteWeight;
         private Set<LocalizationVertex> visitedVertexes;
         private boolean wantsToMove;
+        private double distanceToDestination;
+        private Long groupId;
+        private Agent leader;
+        private Long agentId;
 
         public Builder() {
         }
@@ -125,8 +148,44 @@ public class Agent {
             return this;
         }
 
+        public Builder distanceToDestination(double val) {
+            distanceToDestination = val;
+            return this;
+        }
+
+        public Builder groupId(Long val) {
+            groupId = val;
+            return this;
+        }
+
+        public Builder leader(Agent val) {
+            leader = val;
+            return this;
+        }
+
         public Agent build() {
             return new Agent(this);
         }
+
+        public Builder agentId(Long val) {
+            agentId = val;
+            return this;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Agent{" +
+                "agentId=" + agentId +
+//                ", currentLocalization=" + currentLocalization +
+//                ", currentVertex=" + currentVertex +
+//                ", destinationVertex=" + destinationVertex +
+//                ", preferredRouteWeight=" + preferredRouteWeight +
+//                ", visitedVertexes=" + visitedVertexes +
+//                ", wantsToMove=" + wantsToMove +
+//                ", distanceToDestination=" + distanceToDestination +
+                ", groupId=" + groupId +
+                ", leader=" + leader +
+                '}';
     }
 }

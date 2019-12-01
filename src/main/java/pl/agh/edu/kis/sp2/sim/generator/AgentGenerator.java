@@ -13,7 +13,7 @@ public class AgentGenerator {
         this.localizationGenerator = new LocalizationGenerator();
     }
 
-    public List<Agent> generateAgentsOnVertex(LocalizationVertex localizationVertex, int agentsCountBoundary) {
+    public List<Agent> generateAgentsOnVertex(LocalizationVertex localizationVertex, int agentsCountBoundary, List<Long> groupIds) {
         Random g = new Random();
         int agentsCount = g.nextInt(agentsCountBoundary) + 20;
         List<Agent> agents = new ArrayList<>();
@@ -21,14 +21,24 @@ public class AgentGenerator {
         visited.add(localizationVertex);
 
         for (int i = 0; i < agentsCount; i++) {
-            agents.add(new Agent.Builder()
+            Long groupId = g.nextBoolean() ? groupIds.get(g.nextInt(groupIds.size())) : null;
+            Agent agent = new Agent.Builder()
+                    .agentId((long) i)
                     .currentLocalization(localizationVertex.getLocalization())
                     .currentVertex(localizationVertex)
                     .preferredRouteWeight(g.nextInt(4) + 1)
 //                    .preferredRouteWeight(i)
                     .wantsToMove(g.nextBoolean())
                     .visitedVertexes(visited)
-                    .build());
+                    .groupId(groupId)
+                    .leader(groupId != null ? agents
+                            .stream()
+                            .filter(a -> a.getGroupId() != null && a.getGroupId().equals(groupId))
+                            .findFirst()
+                            .orElse(null): null)
+                    .build();
+            System.out.println(agent);
+            agents.add(agent);
         }
 
         return agents;

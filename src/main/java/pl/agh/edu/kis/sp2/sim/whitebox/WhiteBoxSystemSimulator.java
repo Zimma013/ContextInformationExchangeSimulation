@@ -2,7 +2,7 @@ package pl.agh.edu.kis.sp2.sim.whitebox;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
-import org.jgrapht.traverse.DepthFirstIterator;
+import org.jgrapht.traverse.BreadthFirstIterator;
 import pl.agh.edu.kis.sp2.sim.generator.agent.Agent;
 import pl.agh.edu.kis.sp2.sim.generator.graph.LocalizationVertex;
 import pl.agh.edu.kis.sp2.sim.generator.wftr.Localization;
@@ -30,20 +30,34 @@ public class WhiteBoxSystemSimulator {
 
 
 	public void simulate(int iterationsCount) {
+		System.out.println("========================== Starting  parameters ==========================");
+		System.out.println("== Population " + population.size());
+		System.out.println("== mountainRoutesGraph.vertices " + mountainRoutesGraph.vertexSet().size());
+		System.out.println("== mountainRoutesGraph.edges " + mountainRoutesGraph.edgeSet().size());
+		System.out.println("== simulatedWeatherConditionsMode " + simulatedWeatherConditionsMode);
+		System.out.println("== weatherSensors " + weatherSensors.size());
+		System.out.println("==========================================================================");
+		System.out.println();
 
 		for(int i = 0; i < iterationsCount; i++) {
+			System.out.println("Simulation iteration ----- " + (i + 1));
+			System.out.println();
 
-			Iterator<LocalizationVertex> iterator = new DepthFirstIterator<>(this.mountainRoutesGraph, this.rootVertex);
+			Iterator<LocalizationVertex> iterator = new BreadthFirstIterator<>(this.mountainRoutesGraph, this.rootVertex);
 			while (iterator.hasNext()) {
 				LocalizationVertex localizationVertex = iterator.next();
 				Set<DefaultWeightedEdge> edges = mountainRoutesGraph.outgoingEdgesOf(localizationVertex);
 				System.out.println("Current ------ " + localizationVertex);
 
-				edges.forEach(edge -> {
+				edges.stream()
+				.filter(edge -> !mountainRoutesGraph.getEdgeTarget(edge).equals(localizationVertex))
+				.forEach(edge -> {
+
 					List<Agent> agents = localizationVertex.getAgentsInLocalization()
-							.stream()
-							.filter(agent -> mountainRoutesGraph.getEdgeWeight(edge) <= agent.getPreferredRouteWeight())
-							.collect(Collectors.toList());
+						.stream()
+						.filter(agent -> mountainRoutesGraph.getEdgeWeight(edge) <= agent.getPreferredRouteWeight())
+						.collect(Collectors.toList());
+
 					System.out.println("Target ------ " + mountainRoutesGraph.getEdgeTarget(edge));
 					for (Agent agent : agents) {
 //                        if (agent.isWantsToMove()) {
@@ -68,7 +82,7 @@ public class WhiteBoxSystemSimulator {
 				});
 			}
 
-			movePopulationWithConstSpeed(100);
+			movePopulationWithConstSpeed(10);
 
 			finishPopulationMovement();
 
@@ -80,23 +94,36 @@ public class WhiteBoxSystemSimulator {
 	private void movePopulationWithConstSpeed(int movementRate) {
 		for (LocalizationVertex vertex : mountainRoutesGraph.vertexSet()) {
 			vertex.getAgentsMovingToLocalization()
-					.forEach(agent ->
-							agent.setDistanceToDestination(LocalizationDistanceUtility.distance(
-							agent.getCurrentVertex().getLocalization().getLatitude().doubleValue(), agent.getCurrentVertex().getLocalization().getLongitude().doubleValue(),
-							agent.getDestinationVertex().getLocalization().getLatitude().doubleValue(), agent.getDestinationVertex().getLocalization().getLongitude().doubleValue(),
-							'K') / movementRate)
+					.forEach(agent -> {
+//						System.out.println("Agent distance to dest --------- " + agent.getDistanceToDestination());
+								double movementSpeed = LocalizationDistanceUtility.distance(
+										agent.getCurrentVertex().getLocalization().getLatitude().doubleValue(), agent.getCurrentVertex().getLocalization().getLongitude().doubleValue(),
+										agent.getDestinationVertex().getLocalization().getLatitude().doubleValue(), agent.getDestinationVertex().getLocalization().getLongitude().doubleValue(),
+										'K') / (movementRate ); //* mountainRoutesGraph.getEdge(agent.getCurrentVertex(), agent.getDestinationVertex()).getWeight()
+								agent.setDistanceToDestination(agent.getDistanceToDestination() - movementSpeed);
+//						System.out.println("Agent distance to dest 2 --------- " + agent.getDistanceToDestination());
+							}
 					);
 		}
 	}
 
 	private void finishPopulationMovement() {
-		Iterator<LocalizationVertex> iterator = new DepthFirstIterator<>(this.mountainRoutesGraph, rootVertex);
+		Iterator<LocalizationVertex> iterator = new BreadthFirstIterator<>(this.mountainRoutesGraph, rootVertex);
 		while (iterator.hasNext()) {
 			LocalizationVertex localizationVertex = iterator.next();
-			localizationVertex.getAgentsInLocalization().addAll(localizationVertex.getAgentsMovingToLocalization().stream()
+			List<Agent> agentsReachedTheDestination = localizationVertex.getAgentsMovingToLocalization().stream()
 					.filter(agent -> agent.getDistanceToDestination() <= 0D)
-					.collect(Collectors.toList()));
-			localizationVertex.setAgentsMovingToLocalization(new ArrayList<>());
+					.collect(Collectors.toList());
+
+			if (!agentsReachedTheDestination.isEmpty()) {
+				System.out.println("Agents that reached destination (source) ----- " + agentsReachedTheDestination.get(0).getCurrentVertex());
+				System.out.println("Agents that reached destination (target) ----- " + agentsReachedTheDestination.get(0).getDestinationVertex());
+				System.out.println("Agents that reached destination ----- " + agentsReachedTheDestination.size());
+				localizationVertex.getAgentsInLocalization().addAll(agentsReachedTheDestination);
+				localizationVertex.setAgentsMovingToLocalization(new ArrayList<>());
+			}
+
+
 		}
 	}
 

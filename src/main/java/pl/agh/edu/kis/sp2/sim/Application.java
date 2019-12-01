@@ -12,6 +12,7 @@ import pl.agh.edu.kis.sp2.sim.whitebox.WhiteBoxSystemSimulator;
 import pl.agh.edu.kis.sp2.sim.whitebox.WhiteBoxSystemSimulatorConfigurator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -28,7 +29,7 @@ public class Application {
                 .localization(localizationGenerator.generateLocalization())
                 .vertexId(1)
                 .build();
-        List<Agent> population = new AgentGenerator().generateAgentsOnVertex(l1, 300);
+        List<Agent> population = new AgentGenerator().generateAgentsOnVertex(l1, 300, Arrays.asList(1L, 2L, 3L, 4L));
         l1.setAgentsInLocalization(population);
 
         SimpleWeightedGraph<LocalizationVertex, DefaultWeightedEdge> localizationGraph = GraphGenerator.createGraph(l1,3, 4);
@@ -42,7 +43,7 @@ public class Application {
                 .weatherSensors(new WeatherSensorGenerator().generateWeatherSensors(7, simulatedWeatherConditionsMode))
                 .build();
 
-        simulator.simulate(4);
+        simulator.simulate(200);
 
     }
 }
