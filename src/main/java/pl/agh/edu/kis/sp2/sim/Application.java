@@ -21,7 +21,8 @@ import java.util.List;
 
 
 public class Application {
-    static Data data = new Data(0,0,0,0,0);
+    public static Data data = new Data(0,0,0,0,0);
+    public static ExcelWriter excelWriter = new ExcelWriter();
     public static void main(String[] args) throws IOException {
         int simulatedWeatherConditionsMode = 1;
         LocalizationGenerator localizationGenerator = new LocalizationGenerator();
@@ -47,8 +48,6 @@ public class Application {
                 .build();
 
         simulator.simulate(200);
-        ExcelWriter excelWriter = new ExcelWriter();
-        excelWriter.addToDataList(data);
         String excelFilePath = "NiceContextData.xls";
 
         excelWriter.writeExcel(excelWriter.getDataList(), excelFilePath);
