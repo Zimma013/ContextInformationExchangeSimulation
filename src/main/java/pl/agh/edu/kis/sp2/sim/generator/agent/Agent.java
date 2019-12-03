@@ -3,7 +3,9 @@ package pl.agh.edu.kis.sp2.sim.generator.agent;
 import pl.agh.edu.kis.sp2.sim.generator.graph.LocalizationVertex;
 import pl.agh.edu.kis.sp2.sim.generator.wftr.Localization;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Agent {
     private Long agentId;
@@ -16,6 +18,7 @@ public class Agent {
     private double distanceToDestination;
     private Long groupId;
     private Agent leader;
+    private List<Agent> groupAgents;
 
 
     private Agent(Builder builder) {
@@ -29,6 +32,7 @@ public class Agent {
         setDistanceToDestination(builder.distanceToDestination);
         groupId = builder.groupId;
         leader = builder.leader;
+        groupAgents = builder.groupAgents;
     }
 
     public Long getAgentId() {
@@ -103,6 +107,14 @@ public class Agent {
         return leader;
     }
 
+    public List<Agent> getGroupAgents() {
+        return groupAgents;
+    }
+
+    public void setGroupAgents(List<Agent> groupAgents) {
+        this.groupAgents = groupAgents;
+    }
+
     public static final class Builder {
         private Localization currentLocalization;
         private LocalizationVertex currentVertex;
@@ -113,6 +125,7 @@ public class Agent {
         private double distanceToDestination;
         private Long groupId;
         private Agent leader;
+        private List<Agent> groupAgents;
         private Long agentId;
 
         public Builder() {
@@ -163,6 +176,11 @@ public class Agent {
             return this;
         }
 
+        public Builder groupAgents(List<Agent> val) {
+            groupAgents = val;
+            return this;
+        }
+
         public Agent build() {
             return new Agent(this);
         }
@@ -186,6 +204,7 @@ public class Agent {
 //                ", distanceToDestination=" + distanceToDestination +
                 ", groupId=" + groupId +
                 ", leader=" + leader +
+                ", groupAgents=" + groupAgents.stream().map(Agent::getAgentId).collect(Collectors.toList()) +
                 '}';
     }
 }

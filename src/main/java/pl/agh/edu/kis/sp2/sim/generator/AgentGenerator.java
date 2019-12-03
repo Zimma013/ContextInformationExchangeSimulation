@@ -36,7 +36,12 @@ public class AgentGenerator {
                             .filter(a -> a.getGroupId() != null && a.getGroupId().equals(groupId))
                             .findFirst()
                             .orElse(null): null)
+                    .groupAgents(new ArrayList<>())
                     .build();
+
+            if (agent.getLeader() != null) {
+                agent.getLeader().getGroupAgents().add(agent);
+            }
             System.out.println(agent);
             agents.add(agent);
         }
