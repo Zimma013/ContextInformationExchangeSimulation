@@ -14,6 +14,7 @@ import pl.agh.edu.kis.sp2.sim.whitebox.WhiteBoxSystemSimulator;
 import pl.agh.edu.kis.sp2.sim.whitebox.WhiteBoxSystemSimulatorConfigurator;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -42,6 +43,7 @@ public class Application {
                 .population(population)
                 .simulatedWeatherConditionsMode(simulatedWeatherConditionsMode)
                 .weatherSensors(new WeatherSensorGenerator().generateWeatherSensors(7, simulatedWeatherConditionsMode))
+                .maxDistanceToLeader(new BigDecimal(0.1))
                 .build();
 
         simulator.simulate(200);

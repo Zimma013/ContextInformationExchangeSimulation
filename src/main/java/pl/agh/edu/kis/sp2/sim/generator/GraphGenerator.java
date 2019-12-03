@@ -52,7 +52,7 @@ public class GraphGenerator {
                         int weight = gen.nextInt(maxWeight) + 1;
                         g.setEdgeWeight(edge, weight);
 
-                        System.out.println("Weight of edge --- " + edge.toString() + " --------- w: " + weight);
+//                        System.out.println("Weight of edge --- " + edge.toString() + " --------- w: " + weight);
                     }
                 }
             }

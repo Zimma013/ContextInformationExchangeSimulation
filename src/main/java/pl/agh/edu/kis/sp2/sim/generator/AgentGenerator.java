@@ -41,8 +41,9 @@ public class AgentGenerator {
 
             if (agent.getLeader() != null) {
                 agent.getLeader().getGroupAgents().add(agent);
+                agent.setPreferredRouteWeight(agent.getLeader().getPreferredRouteWeight());
             }
-            System.out.println(agent);
+//            System.out.println(agent);
             agents.add(agent);
         }
 

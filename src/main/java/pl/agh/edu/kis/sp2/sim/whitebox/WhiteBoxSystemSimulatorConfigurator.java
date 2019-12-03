@@ -6,6 +6,7 @@ import pl.agh.edu.kis.sp2.sim.generator.agent.Agent;
 import pl.agh.edu.kis.sp2.sim.generator.graph.LocalizationVertex;
 import pl.agh.edu.kis.sp2.sim.generator.wftr.WeatherSensor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class WhiteBoxSystemSimulatorConfigurator {
@@ -43,6 +44,11 @@ public class WhiteBoxSystemSimulatorConfigurator {
 
 	public WhiteBoxSystemSimulatorConfigurator weatherSensors(List<WeatherSensor> val) {
 		this.simulator.setWeatherSensors(val);
+		return this;
+	}
+
+	public WhiteBoxSystemSimulatorConfigurator maxDistanceToLeader(BigDecimal val) {
+		this.simulator.setMaxDistanceToLeader(val);
 		return this;
 	}
 

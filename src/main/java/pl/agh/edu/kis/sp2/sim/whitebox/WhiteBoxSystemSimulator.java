@@ -25,7 +25,10 @@ public class WhiteBoxSystemSimulator {
 	private int simulatedWeatherConditionsMode;
 	private double localizationDataRedundancyCoefficient;
 	private List<WeatherSensor> weatherSensors;
+	private BigDecimal maxDistanceToLeader;
 
+
+	private Double randomLocalizationCompensationRate = 100D;
 	private Random generator = new Random();
 
 	WhiteBoxSystemSimulator() {
@@ -45,21 +48,35 @@ public class WhiteBoxSystemSimulator {
 		for(int i = 0; i < iterationsCount; i++) {
 			System.out.println("Simulation iteration ----- " + (i + 1));
 			System.out.println();
+			System.out.println("========================== Agent routes ==================================");
+			findRoutesForAgents();
+			System.out.println("========================== Movement ======================================");
+			movePopulationWithConstSpeed(10);
+			System.out.println("========================== Relationship check ============================");
+			checkForRelationshipConstraints();
+			System.out.println("========================== Finish movement ===============================");
+			finishPopulationMovement();
+			System.out.println("==========================================================================");
+			System.out.println();
+			System.out.println();
+		}
+	}
 
-			Iterator<LocalizationVertex> iterator = new BreadthFirstIterator<>(this.mountainRoutesGraph, this.rootVertex);
-			while (iterator.hasNext()) {
-				LocalizationVertex localizationVertex = iterator.next();
-				Set<DefaultWeightedEdge> edges = mountainRoutesGraph.outgoingEdgesOf(localizationVertex);
-				System.out.println("Current ------ " + localizationVertex);
+	private void findRoutesForAgents() {
+		Iterator<LocalizationVertex> iterator = new BreadthFirstIterator<>(this.mountainRoutesGraph, this.rootVertex);
+		while (iterator.hasNext()) {
+			LocalizationVertex localizationVertex = iterator.next();
+			Set<DefaultWeightedEdge> edges = mountainRoutesGraph.outgoingEdgesOf(localizationVertex);
+			System.out.println("Current ------ " + localizationVertex);
 
-				edges.stream()
+			edges.stream()
 				.filter(edge -> !mountainRoutesGraph.getEdgeTarget(edge).equals(localizationVertex))
 				.forEach(edge -> {
 
 					List<Agent> agents = localizationVertex.getAgentsInLocalization()
-						.stream()
-						.filter(agent -> mountainRoutesGraph.getEdgeWeight(edge) <= agent.getPreferredRouteWeight())
-						.collect(Collectors.toList());
+							.stream()
+							.filter(agent -> mountainRoutesGraph.getEdgeWeight(edge) <= agent.getPreferredRouteWeight())
+							.collect(Collectors.toList());
 
 					LocalizationVertex target = mountainRoutesGraph.getEdgeTarget(edge);
 					System.out.println("Target ------ " + target);
@@ -70,29 +87,42 @@ public class WhiteBoxSystemSimulator {
 //						if (agent.getVisitedVertexes().contains(localizationVertex)) {
 //							LocalizationVertex destination = mountainRoutesGraph.getEdgeTarget(edge);
 						target.addAgentMovingToLocation(agent, new Localization.Builder().latitude(new BigDecimal(0.00002D)).longitude(new BigDecimal(0.00002D)).build());
-							agent.setDestinationVertex(target);
-							agent.setDistanceToDestination(
-									LocalizationDistanceUtility.distance(
-											localizationVertex.getLocalization().getLatitude().doubleValue(), localizationVertex.getLocalization().getLongitude().doubleValue(),
-											target.getLocalization().getLatitude().doubleValue(), target.getLocalization().getLongitude().doubleValue(),
-											'K'));
-							agent.addVertexToVisited(localizationVertex);
-							localizationVertex.removeAgentFromLocation(agent);
+						agent.setDestinationVertex(target);
+						agent.setDistanceToDestination(
+								LocalizationDistanceUtility.distance(
+										localizationVertex.getLocalization().getLatitude().doubleValue(), localizationVertex.getLocalization().getLongitude().doubleValue(),
+										target.getLocalization().getLatitude().doubleValue(), target.getLocalization().getLongitude().doubleValue(),
+										'K'));
+						agent.addVertexToVisited(localizationVertex);
+						localizationVertex.removeAgentFromLocation(agent);
 //						}
 
 //                        }
 //                        agent.setWantsToMove(new Random().nextBoolean());
 					}
-				});
-			}
-
-			movePopulationWithConstSpeed(10);
-
-			finishPopulationMovement();
-
-			System.out.println();
-			System.out.println();
+				}
+			);
 		}
+	}
+
+	private void checkForRelationshipConstraints() {
+		List<Agent> leaders = population.stream().filter(agent -> agent.getLeader() == null).collect(Collectors.toList());
+		for (Agent leader : leaders) {
+			leader.getGroupAgents().forEach(agent -> {
+				Double currentDistanceToLeader = LocalizationDistanceUtility.distance(
+						agent.getCurrentLocalization().getLatitude().doubleValue(),
+						agent.getCurrentLocalization().getLongitude().doubleValue(),
+						leader.getCurrentLocalization().getLatitude().doubleValue(),
+						leader.getCurrentLocalization().getLongitude().doubleValue(),
+						'K');
+				if (currentDistanceToLeader.compareTo(this.maxDistanceToLeader.doubleValue()) > 0) {
+					System.out.println("SCREAM ------------------------------------------------------ ");
+					System.out.println("SCREAM ------ agent is " + currentDistanceToLeader + "KM away from group leader");
+					System.out.println("SCREAM ------------------------------------------------------ ");
+				}
+			});
+		}
+
 	}
 
 	private void movePopulationWithConstSpeed(int movementRate) {
@@ -108,8 +138,20 @@ public class WhiteBoxSystemSimulator {
 
 								Localization currentLocalization = agent.getCurrentLocalization();
 								agent.setCurrentLocalization(new Localization.Builder()
-										.longitude(currentLocalization.getLongitude().subtract(new BigDecimal(generator.nextDouble()/50)).setScale(2, RoundingMode.HALF_UP))
-										.latitude(currentLocalization.getLatitude().subtract(new BigDecimal(generator.nextDouble()/50)).setScale(2, RoundingMode.HALF_UP))
+										.longitude(currentLocalization.getLongitude().add(currentLocalization.getLongitude()
+												.subtract(agent.getDestinationVertex().getLocalization().getLongitude())
+												.divide(new BigDecimal(movementRate), 10, RoundingMode.HALF_UP)
+												.subtract(new BigDecimal(generator.nextDouble()/randomLocalizationCompensationRate)
+														.multiply(new BigDecimal(generator.nextBoolean() ? 1 : -1))
+														.setScale(10, RoundingMode.HALF_UP)
+												)).setScale(10, RoundingMode.HALF_UP))
+										.latitude(currentLocalization.getLatitude().add(currentLocalization.getLatitude()
+												.subtract(agent.getDestinationVertex().getLocalization().getLatitude())
+												.divide(new BigDecimal(movementRate), 10, RoundingMode.HALF_UP)
+												.subtract(new BigDecimal(generator.nextDouble()/randomLocalizationCompensationRate)
+														.multiply(new BigDecimal(generator.nextBoolean() ? 1 : -1))
+														.setScale(10, RoundingMode.HALF_UP)
+												)).setScale(10, RoundingMode.HALF_UP))
 										.build());
 
 								double movementSpeed = LocalizationDistanceUtility.distance(
@@ -198,5 +240,9 @@ public class WhiteBoxSystemSimulator {
 
 	void setWeatherSensors(List<WeatherSensor> weatherSensors) {
 		this.weatherSensors = weatherSensors;
+	}
+
+	public void setMaxDistanceToLeader(BigDecimal maxDistanceToLeader) {
+		this.maxDistanceToLeader = maxDistanceToLeader;
 	}
 }
