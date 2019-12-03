@@ -10,9 +10,10 @@ import pl.agh.edu.kis.sp2.sim.generator.wftr.WeatherSensor;
 import pl.agh.edu.kis.sp2.sim.util.LocalizationDistanceUtility;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.math.RoundingMode;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,8 @@ public class WhiteBoxSystemSimulator {
 	private int simulatedWeatherConditionsMode;
 	private double localizationDataRedundancyCoefficient;
 	private List<WeatherSensor> weatherSensors;
+
+	private Random generator = new Random();
 
 	WhiteBoxSystemSimulator() {
 	}
@@ -58,19 +61,20 @@ public class WhiteBoxSystemSimulator {
 						.filter(agent -> mountainRoutesGraph.getEdgeWeight(edge) <= agent.getPreferredRouteWeight())
 						.collect(Collectors.toList());
 
-					System.out.println("Target ------ " + mountainRoutesGraph.getEdgeTarget(edge));
+					LocalizationVertex target = mountainRoutesGraph.getEdgeTarget(edge);
+					System.out.println("Target ------ " + target);
 					for (Agent agent : agents) {
 //                        if (agent.isWantsToMove()) {
 
 						// Something is wrong here, besides TPing to next vertex
 //						if (agent.getVisitedVertexes().contains(localizationVertex)) {
-							LocalizationVertex destination = mountainRoutesGraph.getEdgeTarget(edge);
-									destination.addAgentMovingToLocation(agent, new Localization.Builder().latitude(new BigDecimal(0.00002D)).longitude(new BigDecimal(0.00002D)).build());
-							agent.setDestinationVertex(destination);
+//							LocalizationVertex destination = mountainRoutesGraph.getEdgeTarget(edge);
+						target.addAgentMovingToLocation(agent, new Localization.Builder().latitude(new BigDecimal(0.00002D)).longitude(new BigDecimal(0.00002D)).build());
+							agent.setDestinationVertex(target);
 							agent.setDistanceToDestination(
 									LocalizationDistanceUtility.distance(
 											localizationVertex.getLocalization().getLatitude().doubleValue(), localizationVertex.getLocalization().getLongitude().doubleValue(),
-											destination.getLocalization().getLatitude().doubleValue(), destination.getLocalization().getLongitude().doubleValue(),
+											target.getLocalization().getLatitude().doubleValue(), target.getLocalization().getLongitude().doubleValue(),
 											'K'));
 							agent.addVertexToVisited(localizationVertex);
 							localizationVertex.removeAgentFromLocation(agent);
@@ -96,8 +100,20 @@ public class WhiteBoxSystemSimulator {
 			vertex.getAgentsMovingToLocalization()
 					.forEach(agent -> {
 //						System.out.println("Agent distance to dest --------- " + agent.getDistanceToDestination());
-								double movementSpeed = LocalizationDistanceUtility.distance(
+								/*double movementSpeed = LocalizationDistanceUtility.distance(
 										agent.getCurrentVertex().getLocalization().getLatitude().doubleValue(), agent.getCurrentVertex().getLocalization().getLongitude().doubleValue(),
+										agent.getDestinationVertex().getLocalization().getLatitude().doubleValue(), agent.getDestinationVertex().getLocalization().getLongitude().doubleValue(),
+										'K') / (movementRate ); //* mountainRoutesGraph.getEdge(agent.getCurrentVertex(), agent.getDestinationVertex()).getWeight()
+								agent.setDistanceToDestination(agent.getDistanceToDestination() - movementSpeed);*/
+
+								Localization currentLocalization = agent.getCurrentLocalization();
+								agent.setCurrentLocalization(new Localization.Builder()
+										.longitude(currentLocalization.getLongitude().subtract(new BigDecimal(generator.nextDouble()/50)).setScale(2, RoundingMode.HALF_UP))
+										.latitude(currentLocalization.getLatitude().subtract(new BigDecimal(generator.nextDouble()/50)).setScale(2, RoundingMode.HALF_UP))
+										.build());
+
+								double movementSpeed = LocalizationDistanceUtility.distance(
+										agent.getCurrentLocalization().getLatitude().doubleValue(), agent.getCurrentLocalization().getLongitude().doubleValue(),
 										agent.getDestinationVertex().getLocalization().getLatitude().doubleValue(), agent.getDestinationVertex().getLocalization().getLongitude().doubleValue(),
 										'K') / (movementRate ); //* mountainRoutesGraph.getEdge(agent.getCurrentVertex(), agent.getDestinationVertex()).getWeight()
 								agent.setDistanceToDestination(agent.getDistanceToDestination() - movementSpeed);
@@ -120,7 +136,8 @@ public class WhiteBoxSystemSimulator {
 				System.out.println("Agents that reached destination (target) ----- " + agentsReachedTheDestination.get(0).getDestinationVertex());
 				System.out.println("Agents that reached destination ----- " + agentsReachedTheDestination.size());
 				localizationVertex.getAgentsInLocalization().addAll(agentsReachedTheDestination);
-				localizationVertex.setAgentsMovingToLocalization(new ArrayList<>());
+
+				localizationVertex.getAgentsMovingToLocalization().removeAll(agentsReachedTheDestination);
 			}
 
 
