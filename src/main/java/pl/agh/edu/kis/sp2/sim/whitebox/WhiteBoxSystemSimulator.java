@@ -3,6 +3,7 @@ package pl.agh.edu.kis.sp2.sim.whitebox;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.traverse.BreadthFirstIterator;
+import pl.agh.edu.kis.sp2.sim.excel.Data;
 import pl.agh.edu.kis.sp2.sim.generator.agent.Agent;
 import pl.agh.edu.kis.sp2.sim.generator.graph.LocalizationVertex;
 import pl.agh.edu.kis.sp2.sim.generator.wftr.Localization;
@@ -16,6 +17,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static pl.agh.edu.kis.sp2.sim.Application.excelWriter;
+import static pl.agh.edu.kis.sp2.sim.Application.data;
 
 public class WhiteBoxSystemSimulator {
 
@@ -90,6 +94,8 @@ public class WhiteBoxSystemSimulator {
 
 			finishPopulationMovement();
 
+			excelWriter.addToDataList(data);
+			data = new Data(0,0,0,0,0);
 			System.out.println();
 			System.out.println();
 		}
