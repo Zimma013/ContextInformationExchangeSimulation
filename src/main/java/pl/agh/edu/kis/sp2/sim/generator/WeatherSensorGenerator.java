@@ -14,6 +14,7 @@ public class WeatherSensorGenerator {
 
 		for (int i = 0; i < count; i++) {
 			WeatherSensor sensor = new WeatherSensor.Builder()
+					.weatherSensorId(i + 1L)
 					.localization(localizationGenerator.generateLocalization())
 					.weatherConditionSimulationValue(weatherConditionSimulationValue)
 					.build();

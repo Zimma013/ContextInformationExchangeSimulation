@@ -43,8 +43,8 @@ public class Application {
                 .rootVertex(l1)
                 .population(population)
                 .simulatedWeatherConditionsMode(simulatedWeatherConditionsMode)
-                .weatherSensors(new WeatherSensorGenerator().generateWeatherSensors(7, simulatedWeatherConditionsMode))
-                .maxDistanceToLeader(new BigDecimal(0.1))
+                .weatherSensors(new WeatherSensorGenerator().generateWeatherSensors(200, simulatedWeatherConditionsMode))
+                .maxDistanceToLeader(new BigDecimal(0.050))
                 .build();
 
         simulator.simulate(200);

@@ -18,8 +18,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static pl.agh.edu.kis.sp2.sim.Application.excelWriter;
 import static pl.agh.edu.kis.sp2.sim.Application.data;
+import static pl.agh.edu.kis.sp2.sim.Application.excelWriter;
 
 public class WhiteBoxSystemSimulator {
 
@@ -30,6 +30,7 @@ public class WhiteBoxSystemSimulator {
 	private double localizationDataRedundancyCoefficient;
 	private List<WeatherSensor> weatherSensors;
 	private BigDecimal maxDistanceToLeader;
+	private int movementRate = 10;
 
 
 	private Double randomLocalizationCompensationRate = 100D;
@@ -55,11 +56,13 @@ public class WhiteBoxSystemSimulator {
 			System.out.println("========================== Agent routes ==================================");
 			findRoutesForAgents();
 			System.out.println("========================== Movement ======================================");
-			movePopulationWithConstSpeed(10);
+			movePopulationWithConstSpeed();
 			System.out.println("========================== Relationship check ============================");
 			checkForRelationshipConstraints();
 			System.out.println("========================== Finish movement ===============================");
 			finishPopulationMovement();
+			System.out.println("========================== Generate new weather ==========================");
+			generateNewWeatherInSensors();
 			System.out.println("==========================================================================");
 			System.out.println();
 			System.out.println();
@@ -69,6 +72,14 @@ public class WhiteBoxSystemSimulator {
 			System.out.println();
 			System.out.println();
 		}
+	}
+
+	private void generateNewWeatherInSensors() {
+		weatherSensors.forEach(weatherSensor -> {
+			if (generator.nextBoolean()) {
+				weatherSensor.generateWeatherData(simulatedWeatherConditionsMode);
+			}
+		});
 	}
 
 	private void findRoutesForAgents() {
@@ -134,7 +145,7 @@ public class WhiteBoxSystemSimulator {
 
 	}
 
-	private void movePopulationWithConstSpeed(int movementRate) {
+	private void movePopulationWithConstSpeed() {
 		for (LocalizationVertex vertex : mountainRoutesGraph.vertexSet()) {
 			vertex.getAgentsMovingToLocalization()
 					.forEach(agent -> {
@@ -163,6 +174,9 @@ public class WhiteBoxSystemSimulator {
 												)).setScale(10, RoundingMode.HALF_UP))
 										.build());
 
+								agent.setWeatherSensor(getClosestWeatherSensor(agent));
+								agent.setCurrentWeather(agent.getWeatherSensor().getWeather());
+
 								double movementSpeed = LocalizationDistanceUtility.distance(
 										agent.getCurrentLocalization().getLatitude().doubleValue(), agent.getCurrentLocalization().getLongitude().doubleValue(),
 										agent.getDestinationVertex().getLocalization().getLatitude().doubleValue(), agent.getDestinationVertex().getLocalization().getLongitude().doubleValue(),
@@ -172,6 +186,19 @@ public class WhiteBoxSystemSimulator {
 							}
 					);
 		}
+	}
+
+	private WeatherSensor getClosestWeatherSensor(Agent agent) {
+		WeatherSensor closestSensor = null;
+		Double minDistance = 99999999D;
+		for (WeatherSensor sensor : weatherSensors) {
+			Double distance = LocalizationDistanceUtility.distance(sensor.getLocalization().getLatitude().doubleValue(), sensor.getLocalization().getLongitude().doubleValue(), agent.getCurrentLocalization().getLatitude().doubleValue(), agent.getCurrentLocalization().getLongitude().doubleValue(), 'K');
+			if (distance <= minDistance) {
+				closestSensor = sensor;
+			}
+		}
+		System.out.println("Closest sensor ------------------------------ " + closestSensor);
+		return closestSensor;
 	}
 
 	private void finishPopulationMovement() {

@@ -2,6 +2,8 @@ package pl.agh.edu.kis.sp2.sim.generator.agent;
 
 import pl.agh.edu.kis.sp2.sim.generator.graph.LocalizationVertex;
 import pl.agh.edu.kis.sp2.sim.generator.wftr.Localization;
+import pl.agh.edu.kis.sp2.sim.generator.wftr.Weather;
+import pl.agh.edu.kis.sp2.sim.generator.wftr.WeatherSensor;
 
 import java.util.List;
 import java.util.Set;
@@ -19,6 +21,8 @@ public class Agent {
     private Long groupId;
     private Agent leader;
     private List<Agent> groupAgents;
+    private WeatherSensor weatherSensor;
+    private Weather currentWeather;
 
 
     private Agent(Builder builder) {
@@ -32,7 +36,9 @@ public class Agent {
         setDistanceToDestination(builder.distanceToDestination);
         groupId = builder.groupId;
         leader = builder.leader;
-        groupAgents = builder.groupAgents;
+        setGroupAgents(builder.groupAgents);
+        setWeatherSensor(builder.weatherSensor);
+        currentWeather = builder.currentWeather;
     }
 
     public Long getAgentId() {
@@ -115,6 +121,22 @@ public class Agent {
         this.groupAgents = groupAgents;
     }
 
+    public WeatherSensor getWeatherSensor() {
+        return weatherSensor;
+    }
+
+    public void setWeatherSensor(WeatherSensor weatherSensor) {
+        this.weatherSensor = weatherSensor;
+    }
+
+    public Weather getCurrentWeather() {
+        return currentWeather;
+    }
+
+    public void setCurrentWeather(Weather currentWeather) {
+        this.currentWeather = currentWeather;
+    }
+
     public static final class Builder {
         private Localization currentLocalization;
         private LocalizationVertex currentVertex;
@@ -126,6 +148,8 @@ public class Agent {
         private Long groupId;
         private Agent leader;
         private List<Agent> groupAgents;
+        private WeatherSensor weatherSensor;
+        private Weather currentWeather;
         private Long agentId;
 
         public Builder() {
@@ -178,6 +202,16 @@ public class Agent {
 
         public Builder groupAgents(List<Agent> val) {
             groupAgents = val;
+            return this;
+        }
+
+        public Builder weatherSensor(WeatherSensor val) {
+            weatherSensor = val;
+            return this;
+        }
+
+        public Builder currentWeather(Weather val) {
+            currentWeather = val;
             return this;
         }
 

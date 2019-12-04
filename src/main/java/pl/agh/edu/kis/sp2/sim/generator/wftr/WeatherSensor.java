@@ -4,12 +4,14 @@ import pl.agh.edu.kis.sp2.sim.generator.enumeration.*;
 
 public class WeatherSensor {
 
+	private Long weatherSensorId;
 	private Weather weather;
 	private Localization localization;
 	private int weatherConditionSimulationValue;
 	private Avalanche avalanche;
 
 	private WeatherSensor(Builder builder) {
+		weatherSensorId = builder.weatherSensorId;
 		weather = builder.weather;
 		localization = builder.localization;
 		weatherConditionSimulationValue = builder.weatherConditionSimulationValue;
@@ -37,6 +39,7 @@ public class WeatherSensor {
 		private Localization localization;
 		private int weatherConditionSimulationValue;
 		private Avalanche avalanche;
+		private Long weatherSensorId;
 
 		public Builder() {
 		}
@@ -63,6 +66,11 @@ public class WeatherSensor {
 
 		public WeatherSensor build() {
 			return new WeatherSensor(this);
+		}
+
+		public Builder weatherSensorId(Long val) {
+			weatherSensorId = val;
+			return this;
 		}
 	}
 
@@ -91,5 +99,16 @@ public class WeatherSensor {
 				.wind(Wind.getRandomWind())
 				.windDirection(WindDirection.randomWindDirection())
 				.build();
+	}
+
+	@Override
+	public String toString() {
+		return "WeatherSensor{" +
+				"weatherSensorId=" + weatherSensorId +
+				", weather=" + weather +
+				", localization=" + localization +
+				", weatherConditionSimulationValue=" + weatherConditionSimulationValue +
+				", avalanche=" + avalanche +
+				'}';
 	}
 }
