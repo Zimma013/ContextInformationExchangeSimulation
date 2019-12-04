@@ -28,6 +28,8 @@ public class AgentGenerator {
                     .currentVertex(localizationVertex)
                     .preferredRouteWeight(g.nextInt(4) + 1)
 //                    .preferredRouteWeight(i)
+                    .minPreferredHour(g.nextInt(11) + 6)
+                    .maxPreferredHour(g.nextInt(11) + 12)
                     .wantsToMove(g.nextBoolean())
                     .visitedVertexes(visited)
                     .groupId(groupId)

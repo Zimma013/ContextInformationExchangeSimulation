@@ -15,6 +15,25 @@ public class Agent {
     private LocalizationVertex currentVertex;
     private LocalizationVertex destinationVertex;
     private int preferredRouteWeight;
+    private double minPreferredHour;
+    private double maxPreferredHour;
+
+    public double getMinPreferredHour() {
+        return minPreferredHour;
+    }
+
+    public void setMinPreferredHour(double minPreferredHour) {
+        this.minPreferredHour = minPreferredHour;
+    }
+
+    public double getMaxPreferredHour() {
+        return maxPreferredHour;
+    }
+
+    public void setMaxPreferredHour(double maxPreferredHour) {
+        this.maxPreferredHour = maxPreferredHour;
+    }
+
     private Set<LocalizationVertex> visitedVertexes;
     private boolean wantsToMove;
     private double distanceToDestination;
@@ -31,6 +50,8 @@ public class Agent {
         setCurrentVertex(builder.currentVertex);
         setDestinationVertex(builder.destinationVertex);
         setPreferredRouteWeight(builder.preferredRouteWeight);
+        setMinPreferredHour(builder.minPreferredHour);
+        setMaxPreferredHour(builder.maxPreferredHour);
         setVisitedVertexes(builder.visitedVertexes);
         setWantsToMove(builder.wantsToMove);
         setDistanceToDestination(builder.distanceToDestination);
@@ -142,6 +163,8 @@ public class Agent {
         private LocalizationVertex currentVertex;
         private LocalizationVertex destinationVertex;
         private int preferredRouteWeight;
+        private double minPreferredHour;
+        private double maxPreferredHour;
         private Set<LocalizationVertex> visitedVertexes;
         private boolean wantsToMove;
         private double distanceToDestination;
@@ -172,6 +195,14 @@ public class Agent {
 
         public Builder preferredRouteWeight(int val) {
             preferredRouteWeight = val;
+            return this;
+        }
+        public Builder minPreferredHour(double val) {
+            minPreferredHour = val;
+            return this;
+        }
+        public Builder maxPreferredHour(double val) {
+            maxPreferredHour = val;
             return this;
         }
 
