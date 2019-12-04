@@ -3,10 +3,10 @@ package pl.agh.edu.kis.sp2.sim.util;
 public class LocalizationDistanceUtility {
 	public static Double distance(double lat1, double lon1, Double lat2, Double lon2, char unit) {
 		if (lat2 == null || lon2 == null) {
-			return null;
+			return 0D;
 		}
 		if ((lat1 == lat2) && (lon1 == lon2)) {
-			return (double) 0;
+			return 0D;
 		}
 		else {
 			double theta = lon1 - lon2;

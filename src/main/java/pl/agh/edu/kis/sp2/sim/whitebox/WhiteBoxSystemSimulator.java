@@ -24,14 +24,16 @@ import static pl.agh.edu.kis.sp2.sim.Application.excelWriter;
 public class WhiteBoxSystemSimulator {
 
 	private List<Agent> population;
+	private List<Agent> dangerousAnimalPopulation;
 	private SimpleWeightedGraph<LocalizationVertex, DefaultWeightedEdge> mountainRoutesGraph;
 	private LocalizationVertex rootVertex;
 	private int simulatedWeatherConditionsMode;
 	private double localizationDataRedundancyCoefficient;
 	private List<WeatherSensor> weatherSensors;
 	private BigDecimal maxDistanceToLeader;
+	private BigDecimal minDistanceToAnimal;
 	private int movementRate = 10;
-
+	private double currentHour = 5;
 
 	private Double randomLocalizationCompensationRate = 100D;
 	private Random generator = new Random();
@@ -57,6 +59,7 @@ public class WhiteBoxSystemSimulator {
 			findRoutesForAgents();
 			System.out.println("========================== Movement ======================================");
 			movePopulationWithConstSpeed();
+			moveDangerousAnimalsWithConstSpeed();
 			System.out.println("========================== Relationship check ============================");
 			checkForRelationshipConstraints();
 			System.out.println("========================== Finish movement ===============================");
@@ -69,8 +72,28 @@ public class WhiteBoxSystemSimulator {
 
 			excelWriter.addToDataList(data);
 			data = new Data(0,0,0,0,0);
+			this.currentHour = this.currentHour+0.10;
+
 			System.out.println();
 			System.out.println();
+		}
+	}
+
+	private void moveDangerousAnimalsWithConstSpeed() {
+		for (Agent animal : dangerousAnimalPopulation) {
+			Localization currentLocalization = animal.getCurrentLocalization();
+			animal.setCurrentLocalization(new Localization.Builder()
+					.longitude(currentLocalization.getLongitude()
+							.subtract(new BigDecimal(generator.nextDouble()/randomLocalizationCompensationRate)
+//								.multiply(new BigDecimal(generator.nextBoolean() ? 1 : -1))
+							)
+							.divide(new BigDecimal(movementRate + generator.nextInt(15)), 10, RoundingMode.HALF_UP))
+					.latitude(currentLocalization.getLatitude()
+							.subtract(new BigDecimal(generator.nextDouble()/randomLocalizationCompensationRate)
+//								.multiply(new BigDecimal(generator.nextBoolean() ? 1 : -1))
+							)
+							.divide(new BigDecimal(movementRate + generator.nextInt(15)), 10, RoundingMode.HALF_UP))
+					.build());
 		}
 	}
 
@@ -96,6 +119,8 @@ public class WhiteBoxSystemSimulator {
 					List<Agent> agents = localizationVertex.getAgentsInLocalization()
 							.stream()
 							.filter(agent -> mountainRoutesGraph.getEdgeWeight(edge) <= agent.getPreferredRouteWeight())
+							.filter(agent -> currentHour >= agent.getMinPreferredHour())
+							.filter(agent -> currentHour <= agent.getMaxPreferredHour())
 							.collect(Collectors.toList());
 
 					LocalizationVertex target = mountainRoutesGraph.getEdgeTarget(edge);
@@ -120,25 +145,52 @@ public class WhiteBoxSystemSimulator {
 //                        }
 //                        agent.setWantsToMove(new Random().nextBoolean());
 					}
-				}
-			);
+				});
 		}
 	}
 
 	private void checkForRelationshipConstraints() {
-		List<Agent> leaders = population.stream().filter(agent -> agent.getLeader() == null).collect(Collectors.toList());
+		List<Agent> leaders = population.stream()
+			.filter(agent -> agent.getLeader() == null && agent.getGroupId() != null)
+			.collect(Collectors.toList());
+		System.out.println("Leader ids --------------------- " + leaders.stream().map(Agent::getAgentId).collect(Collectors.toList()));
 		for (Agent leader : leaders) {
+			System.out.println("Agent ids --------------------- " + leader.getGroupAgents().stream().map(Agent::getAgentId).collect(Collectors.toList()));
+			System.out.println("Leader groupId --------------------- " + leader.getGroupId());
+//			System.out.println("Leader.localization ---------------------------------- " + leader.getCurrentLocalization());
 			leader.getGroupAgents().forEach(agent -> {
-				Double currentDistanceToLeader = LocalizationDistanceUtility.distance(
+//				System.out.println("Agent.localization ---------------------------------- " + agent.getCurrentLocalization());
+				BigDecimal currentDistanceToLeader = new BigDecimal(LocalizationDistanceUtility.distance(
 						agent.getCurrentLocalization().getLatitude().doubleValue(),
 						agent.getCurrentLocalization().getLongitude().doubleValue(),
 						leader.getCurrentLocalization().getLatitude().doubleValue(),
 						leader.getCurrentLocalization().getLongitude().doubleValue(),
+						'K'))
+//						.setScale(10, RoundingMode.HALF_UP)
+						;
+//				System.out.println("NOT-SCREAM ------------ agent is " + currentDistanceToLeader.doubleValue() + "KM away from group leader");
+//				System.out.println("NOT-SCREAM ------------ Max is " + this.maxDistanceToLeader.doubleValue() + "KM away");
+				if (currentDistanceToLeader.doubleValue() >= this.maxDistanceToLeader.doubleValue()) {
+					System.out.println("SCREAM ------------------------------------------------------------ ");
+					System.out.println("SCREAM ------------ agent is " + currentDistanceToLeader + "KM away from group leader");
+					System.out.println("SCREAM ------------------------------------------------------------ ");
+					data.setNumberofRelationsData(data.getNumberofRelationsData()+1);
+				}
+			});
+		}
+
+		for (Agent animal : dangerousAnimalPopulation) {
+			population.forEach(agent -> {
+				Double currentDistanceToAnimal = LocalizationDistanceUtility.distance(
+						agent.getCurrentLocalization().getLatitude().doubleValue(),
+						agent.getCurrentLocalization().getLongitude().doubleValue(),
+						animal.getCurrentLocalization().getLatitude().doubleValue(),
+						animal.getCurrentLocalization().getLongitude().doubleValue(),
 						'K');
-				if (currentDistanceToLeader.compareTo(this.maxDistanceToLeader.doubleValue()) > 0) {
-					System.out.println("SCREAM ------------------------------------------------------ ");
-					System.out.println("SCREAM ------ agent is " + currentDistanceToLeader + "KM away from group leader");
-					System.out.println("SCREAM ------------------------------------------------------ ");
+				if (currentDistanceToAnimal <= this.minDistanceToAnimal.doubleValue()) {
+					System.out.println("SCREAM ANIMAL --------------------------------------------------- ");
+					System.out.println("SCREAM ANIMAL --- agent is " + currentDistanceToAnimal + "KM away from dangerous animal");
+					System.out.println("SCREAM ANIMAL --------------------------------------------------- ");
 					data.setNumberofRelationsData(data.getNumberofRelationsData()+1);
 				}
 			});
@@ -146,19 +198,54 @@ public class WhiteBoxSystemSimulator {
 
 	}
 
+
+	private void checkForRelationshipConstraints(Agent agent) {
+		if(agent.getLeader() != null) {
+			System.out.println("Agent ids --------------------- " + agent.getLeader().getGroupAgents().stream().map(Agent::getAgentId).collect(Collectors.toList()));
+			System.out.println("Leader groupId --------------------- " + agent.getLeader().getGroupId());
+//			System.out.println("Leader.localization ---------------------------------- " + leader.getCurrentLocalization());
+//				System.out.println("Agent.localization ---------------------------------- " + agent.getCurrentLocalization());
+			BigDecimal currentDistanceToLeader = new BigDecimal(LocalizationDistanceUtility.distance(
+					agent.getCurrentLocalization().getLatitude().doubleValue(),
+					agent.getCurrentLocalization().getLongitude().doubleValue(),
+					agent.getLeader().getCurrentLocalization().getLatitude().doubleValue(),
+					agent.getLeader().getCurrentLocalization().getLongitude().doubleValue(),
+					'K'))
+//						.setScale(10, RoundingMode.HALF_UP)
+					;
+//			System.out.println("NOT-SCREAM ------------ agent is " + currentDistanceToLeader.doubleValue() + "KM away from group leader");
+//				System.out.println("NOT-SCREAM ------------ Max is " + this.maxDistanceToLeader.doubleValue() + "KM away");
+			if (currentDistanceToLeader.doubleValue() >= this.maxDistanceToLeader.doubleValue()) {
+				System.out.println("SCREAM ------------------------------------------------------------ ");
+				System.out.println("SCREAM ------------ agent is " + currentDistanceToLeader + "KM away from group leader");
+				System.out.println("SCREAM ------------------------------------------------------------ ");
+			}
+		}
+
+		for (Agent animal : dangerousAnimalPopulation) {
+			Double currentDistanceToAnimal = LocalizationDistanceUtility.distance(
+					agent.getCurrentLocalization().getLatitude().doubleValue(),
+					agent.getCurrentLocalization().getLongitude().doubleValue(),
+					animal.getCurrentLocalization().getLatitude().doubleValue(),
+					animal.getCurrentLocalization().getLongitude().doubleValue(),
+					'K');
+			if (currentDistanceToAnimal <= this.minDistanceToAnimal.doubleValue()) {
+				System.out.println("SCREAM ANIMAL --------------------------------------------------- ");
+				System.out.println("SCREAM ANIMAL --- agent is " + currentDistanceToAnimal + "KM away from dangerous animal");
+				System.out.println("SCREAM ANIMAL --------------------------------------------------- ");
+			}
+		}
+	}
+
 	private void movePopulationWithConstSpeed() {
 		for (LocalizationVertex vertex : mountainRoutesGraph.vertexSet()) {
 			vertex.getAgentsMovingToLocalization()
 					.forEach(agent -> {
 //						System.out.println("Agent distance to dest --------- " + agent.getDistanceToDestination());
-								/*double movementSpeed = LocalizationDistanceUtility.distance(
-										agent.getCurrentVertex().getLocalization().getLatitude().doubleValue(), agent.getCurrentVertex().getLocalization().getLongitude().doubleValue(),
-										agent.getDestinationVertex().getLocalization().getLatitude().doubleValue(), agent.getDestinationVertex().getLocalization().getLongitude().doubleValue(),
-										'K') / (movementRate ); //* mountainRoutesGraph.getEdge(agent.getCurrentVertex(), agent.getDestinationVertex()).getWeight()
-								agent.setDistanceToDestination(agent.getDistanceToDestination() - movementSpeed);*/
+
 
 								Localization currentLocalization = agent.getCurrentLocalization();
-								agent.setCurrentLocalization(new Localization.Builder()
+								Localization newLocalization = new Localization.Builder()
 										.longitude(currentLocalization.getLongitude().add(currentLocalization.getLongitude()
 												.subtract(agent.getDestinationVertex().getLocalization().getLongitude())
 												.divide(new BigDecimal(movementRate), 10, RoundingMode.HALF_UP)
@@ -172,11 +259,15 @@ public class WhiteBoxSystemSimulator {
 												.subtract(new BigDecimal(generator.nextDouble()/randomLocalizationCompensationRate)
 														.multiply(new BigDecimal(generator.nextBoolean() ? 1 : -1))
 														.setScale(10, RoundingMode.HALF_UP)
-												)).setScale(10, RoundingMode.HALF_UP))
-										.build());
+												)).setScale(10, RoundingMode.HALF_UP)
+								)
+								.build();
+								agent.setCurrentLocalization(newLocalization);
 
 								agent.setWeatherSensor(getClosestWeatherSensor(agent));
 								agent.setCurrentWeather(agent.getWeatherSensor().getWeather());
+
+								checkForRelationshipConstraints(agent);
 
 								double movementSpeed = LocalizationDistanceUtility.distance(
 										agent.getCurrentLocalization().getLatitude().doubleValue(), agent.getCurrentLocalization().getLongitude().doubleValue(),
@@ -184,13 +275,15 @@ public class WhiteBoxSystemSimulator {
 										'K') / (movementRate ); //* mountainRoutesGraph.getEdge(agent.getCurrentVertex(), agent.getDestinationVertex()).getWeight()
 								agent.setDistanceToDestination(agent.getDistanceToDestination() - movementSpeed);
 //						System.out.println("Agent distance to dest 2 --------- " + agent.getDistanceToDestination());
+								data.setNumberofActivityData(data.getNumberofActivityData()+1);
 							}
 					);
 		}
+//		checkForRelationshipConstraints();
 	}
 
 	private WeatherSensor getClosestWeatherSensor(Agent agent) {
-		WeatherSensor closestSensor = null;
+		WeatherSensor closestSensor = weatherSensors.get(0);
 		Double minDistance = 99999999D;
 		for (WeatherSensor sensor : weatherSensors) {
 			Double distance = LocalizationDistanceUtility.distance(sensor.getLocalization().getLatitude().doubleValue(), sensor.getLocalization().getLongitude().doubleValue(), agent.getCurrentLocalization().getLatitude().doubleValue(), agent.getCurrentLocalization().getLongitude().doubleValue(), 'K');
@@ -198,7 +291,7 @@ public class WhiteBoxSystemSimulator {
 				closestSensor = sensor;
 			}
 		}
-		System.out.println("Closest sensor ------------------------------ " + closestSensor);
+//		System.out.println("Closest sensor ------------------------------ " + closestSensor);
 		return closestSensor;
 	}
 
@@ -281,5 +374,13 @@ public class WhiteBoxSystemSimulator {
 
 	public void setMaxDistanceToLeader(BigDecimal maxDistanceToLeader) {
 		this.maxDistanceToLeader = maxDistanceToLeader;
+	}
+
+	public void setDangerousAnimalPopulation(List<Agent> dangerousAnimalPopulation) {
+		this.dangerousAnimalPopulation = dangerousAnimalPopulation;
+	}
+
+	public void setMinDistanceToAnimal(BigDecimal minDistanceToAnimal) {
+		this.minDistanceToAnimal = minDistanceToAnimal;
 	}
 }
