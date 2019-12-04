@@ -31,7 +31,6 @@ public class WhiteBoxSystemSimulator {
 	private List<WeatherSensor> weatherSensors;
 	private BigDecimal maxDistanceToLeader;
 	private int movementRate = 10;
-	private double currentHour = 5;
 
 
 	private Double randomLocalizationCompensationRate = 100D;
@@ -70,7 +69,6 @@ public class WhiteBoxSystemSimulator {
 
 			excelWriter.addToDataList(data);
 			data = new Data(0,0,0,0,0);
-			this.currentHour = this.currentHour+0.10;
 			System.out.println();
 			System.out.println();
 		}
@@ -98,8 +96,6 @@ public class WhiteBoxSystemSimulator {
 					List<Agent> agents = localizationVertex.getAgentsInLocalization()
 							.stream()
 							.filter(agent -> mountainRoutesGraph.getEdgeWeight(edge) <= agent.getPreferredRouteWeight())
-							.filter(agent -> currentHour >= agent.getMinPreferredHour())
-							.filter(agent -> currentHour <= agent.getMaxPreferredHour())
 							.collect(Collectors.toList());
 
 					LocalizationVertex target = mountainRoutesGraph.getEdgeTarget(edge);
@@ -188,7 +184,6 @@ public class WhiteBoxSystemSimulator {
 										'K') / (movementRate ); //* mountainRoutesGraph.getEdge(agent.getCurrentVertex(), agent.getDestinationVertex()).getWeight()
 								agent.setDistanceToDestination(agent.getDistanceToDestination() - movementSpeed);
 //						System.out.println("Agent distance to dest 2 --------- " + agent.getDistanceToDestination());
-						data.setNumberofActivityData(data.getNumberofActivityData()+1);
 							}
 					);
 		}

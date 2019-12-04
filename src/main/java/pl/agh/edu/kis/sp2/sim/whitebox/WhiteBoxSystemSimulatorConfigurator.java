@@ -52,7 +52,17 @@ public class WhiteBoxSystemSimulatorConfigurator {
 		return this;
 	}
 
+	public WhiteBoxSystemSimulatorConfigurator dangerousAnimalPopulation(List<Agent> val) {
+		this.simulator.setDangerousAnimalPopulation(val);
+		return this;
+	}
+
 	public WhiteBoxSystemSimulator build() {
 		return this.simulator;
+	}
+
+	public WhiteBoxSystemSimulatorConfigurator minDistanceToAnimal(BigDecimal val) {
+		this.simulator.setMinDistanceToAnimal(val);
+		return this;
 	}
 }

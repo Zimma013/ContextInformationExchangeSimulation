@@ -51,4 +51,18 @@ public class AgentGenerator {
 
         return agents;
     }
+
+    public List<Agent> generateAgents(int count) {
+        List<Agent> agents = new ArrayList<>();
+
+        for (int i = 0; i < count; i++) {
+            Agent agent = new Agent.Builder()
+                    .agentId((long) i)
+                    .currentLocalization(localizationGenerator.generateLocalization())
+                    .build();
+            agents.add(agent);
+        }
+
+        return agents;
+    }
 }
