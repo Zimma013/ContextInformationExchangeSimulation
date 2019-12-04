@@ -16,9 +16,9 @@ public class LocalizationGenerator {
 
     public Localization generateLocalization() {
         return new Localization.Builder()
-                .latitude(new BigDecimal(49.2758701 - (coordinateRandomGenerator.nextDouble()/25) /** (coordinateRandomGenerator.nextBoolean() ? 1 : -1)*/)
+                .latitude(new BigDecimal(49.2758701 - (coordinateRandomGenerator.nextDouble()/15) /** (coordinateRandomGenerator.nextBoolean() ? 1 : -1)*/)
                         .setScale(10, RoundingMode.HALF_UP))
-                .longitude(new BigDecimal(19.9038364 - coordinateRandomGenerator.nextDouble()/25)
+                .longitude(new BigDecimal(19.9038364 - coordinateRandomGenerator.nextDouble()/15)
                         .setScale(10, RoundingMode.HALF_UP))
                 .build();
     }

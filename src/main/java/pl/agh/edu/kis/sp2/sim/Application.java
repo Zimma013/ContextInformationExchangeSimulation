@@ -35,6 +35,8 @@ public class Application {
         List<Agent> population = new AgentGenerator().generateAgentsOnVertex(l1, 300, Arrays.asList(1L, 2L, 3L, 4L));
         l1.setAgentsInLocalization(population);
 
+        List<Agent> dangerousAnimalPopulation = new AgentGenerator().generateAgents(50);
+
         SimpleWeightedGraph<LocalizationVertex, DefaultWeightedEdge> localizationGraph = GraphGenerator.createGraph(l1,3, 4);
 
         WhiteBoxSystemSimulator simulator = new WhiteBoxSystemSimulatorConfigurator()
@@ -43,8 +45,10 @@ public class Application {
                 .rootVertex(l1)
                 .population(population)
                 .simulatedWeatherConditionsMode(simulatedWeatherConditionsMode)
-                .weatherSensors(new WeatherSensorGenerator().generateWeatherSensors(200, simulatedWeatherConditionsMode))
-                .maxDistanceToLeader(new BigDecimal(0.050))
+                .weatherSensors(new WeatherSensorGenerator().generateWeatherSensors(8, simulatedWeatherConditionsMode))
+                .maxDistanceToLeader(new BigDecimal(0.05D))
+                .minDistanceToAnimal(new BigDecimal(0.01D))
+                .dangerousAnimalPopulation(dangerousAnimalPopulation)
                 .build();
 
         simulator.simulate(200);
