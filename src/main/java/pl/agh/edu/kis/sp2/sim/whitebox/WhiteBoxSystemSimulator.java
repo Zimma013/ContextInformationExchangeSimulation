@@ -5,6 +5,10 @@ import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.traverse.BreadthFirstIterator;
 import pl.agh.edu.kis.sp2.sim.excel.Data;
 import pl.agh.edu.kis.sp2.sim.generator.agent.Agent;
+import pl.agh.edu.kis.sp2.sim.generator.enumeration.Fog;
+import pl.agh.edu.kis.sp2.sim.generator.enumeration.Rain;
+import pl.agh.edu.kis.sp2.sim.generator.enumeration.Temperature;
+import pl.agh.edu.kis.sp2.sim.generator.enumeration.Wind;
 import pl.agh.edu.kis.sp2.sim.generator.graph.LocalizationVertex;
 import pl.agh.edu.kis.sp2.sim.generator.wftr.Localization;
 import pl.agh.edu.kis.sp2.sim.generator.wftr.WeatherSensor;
@@ -277,7 +281,10 @@ public class WhiteBoxSystemSimulator {
 
 								agent.setWeatherSensor(getClosestWeatherSensor(agent));
 								agent.setCurrentWeather(agent.getWeatherSensor().getWeather());
-
+								if((agent.getWeatherSensor().getWeather().getFog().compareTo(Fog.F1) == 1) || (agent.getWeatherSensor().getWeather().getRainAmount().compareTo(Rain.R1) == 1)|| (agent.getWeatherSensor().getWeather().getTemperature().compareTo(Temperature.T2) < 0)||(agent.getWeatherSensor().getWeather().getWind().compareTo(Wind.W2) >= 0))
+								{
+								data.setNumberofWeatherData(data.getNumberofWeatherData()+1);
+								}
 								checkForRelationshipConstraints(agent);
 
 								double movementSpeed = LocalizationDistanceUtility.distance(
