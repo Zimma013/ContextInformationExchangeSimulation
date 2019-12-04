@@ -13,6 +13,7 @@ import java.util.List;
 
 public class ExcelWriter {
     private List<Data> dataList;
+    private int rowCount=0;
     public ExcelWriter()
     {
         this.dataList = new ArrayList<>();
@@ -35,35 +36,43 @@ public class ExcelWriter {
     private void writeHeader(Row row)
     {
         Cell cell = row.createCell(0);
-        cell.setCellValue("Number of Relations Data");
+        cell.setCellValue("Iteration");
 
         cell = row.createCell(1);
-        cell.setCellValue("Number of Activity Data");
+        cell.setCellValue("Number of Relations Data");
 
         cell = row.createCell(2);
-        cell.setCellValue("Number of Location Data");
+        cell.setCellValue("Number of Activity Data");
 
         cell = row.createCell(3);
-        cell.setCellValue("Number of Weather Data");
+        cell.setCellValue("Number of Location Data");
 
         cell = row.createCell(4);
+        cell.setCellValue("Number of Weather Data");
+
+        cell = row.createCell(5);
         cell.setCellValue("Number of Time");
     }
     private void writeData(Data aData, Row row) {
+        this.rowCount++;
         Cell cell = row.createCell(0);
+        cell.setCellValue(rowCount);
+        cell = row.createCell(1);
         cell.setCellValue(aData.getNumberofRelationsData());
 
-        cell = row.createCell(1);
+        cell = row.createCell(2);
         cell.setCellValue(aData.getNumberofActivityData());
 
-        cell = row.createCell(2);
+        cell = row.createCell(3);
         cell.setCellValue(aData.getNumberofLocationData());
 
-        cell = row.createCell(3);
+        cell = row.createCell(4);
         cell.setCellValue(aData.getNumberofWeatherData());
 
-        cell = row.createCell(4);
+        cell = row.createCell(5);
         cell.setCellValue(aData.getNumberofTime());
+
+
     }
 
     public List<Data> getDataList() {
