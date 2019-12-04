@@ -69,8 +69,13 @@ public class WhiteBoxSystemSimulator {
 			System.out.println("==========================================================================");
 			System.out.println();
 			System.out.println();
+            int negation = generator.nextBoolean() ? 1 : -1;
 
-			excelWriter.addToDataList(data);
+            double randDouble = generator.nextDouble()/10;
+            System.out.println();
+			data.setNumberofLocationData((int)(100*(localizationDataRedundancyCoefficient + negation * randDouble)));
+            data.setNumberofTime(data.getNumberofTime()+1);
+            excelWriter.addToDataList(data);
 			data = new Data(0,0,0,0,0);
 			this.currentHour = this.currentHour+0.10;
 
@@ -175,6 +180,7 @@ public class WhiteBoxSystemSimulator {
 					System.out.println("SCREAM ------------ agent is " + currentDistanceToLeader + "KM away from group leader");
 					System.out.println("SCREAM ------------------------------------------------------------ ");
 					data.setNumberofRelationsData(data.getNumberofRelationsData()+1);
+                    data.setNumberofTime(data.getNumberofTime()+1);
 				}
 			});
 		}
@@ -192,6 +198,7 @@ public class WhiteBoxSystemSimulator {
 					System.out.println("SCREAM ANIMAL --- agent is " + currentDistanceToAnimal + "KM away from dangerous animal");
 					System.out.println("SCREAM ANIMAL --------------------------------------------------- ");
 					data.setNumberofRelationsData(data.getNumberofRelationsData()+1);
+                    data.setNumberofTime(data.getNumberofTime()+1);
 				}
 			});
 		}
@@ -219,6 +226,8 @@ public class WhiteBoxSystemSimulator {
 				System.out.println("SCREAM ------------------------------------------------------------ ");
 				System.out.println("SCREAM ------------ agent is " + currentDistanceToLeader + "KM away from group leader");
 				System.out.println("SCREAM ------------------------------------------------------------ ");
+                data.setNumberofRelationsData(data.getNumberofRelationsData()+1);
+                data.setNumberofTime(data.getNumberofTime()+1);
 			}
 		}
 
@@ -233,6 +242,8 @@ public class WhiteBoxSystemSimulator {
 				System.out.println("SCREAM ANIMAL --------------------------------------------------- ");
 				System.out.println("SCREAM ANIMAL --- agent is " + currentDistanceToAnimal + "KM away from dangerous animal");
 				System.out.println("SCREAM ANIMAL --------------------------------------------------- ");
+                data.setNumberofRelationsData(data.getNumberofRelationsData()+1);
+                data.setNumberofTime(data.getNumberofTime()+1);
 			}
 		}
 	}
@@ -304,6 +315,7 @@ public class WhiteBoxSystemSimulator {
 					.collect(Collectors.toList());
 
 			if (!agentsReachedTheDestination.isEmpty()) {
+                data.setNumberofTime(data.getNumberofTime()+1);
 				System.out.println("Agents that reached destination (source) ----- " + agentsReachedTheDestination.get(0).getCurrentVertex());
 				System.out.println("Agents that reached destination (target) ----- " + agentsReachedTheDestination.get(0).getDestinationVertex());
 				System.out.println("Agents that reached destination ----- " + agentsReachedTheDestination.size());
