@@ -52,6 +52,17 @@ public class ExcelWriter {
 
         cell = row.createCell(5);
         cell.setCellValue("Number of Time");
+
+        cell = row.createCell(7);
+        cell.setCellValue("AVG of Relations Data");
+        cell = row.createCell(8);
+        cell.setCellValue("AVG of Activity Data");
+        cell = row.createCell(9);
+        cell.setCellValue("AVG of Location Data");
+        cell = row.createCell(10);
+        cell.setCellValue("AVG of Weather Data");
+        cell = row.createCell(11);
+        cell.setCellValue("AVG of Time");
     }
     private void writeData(Data aData, Row row) {
         this.rowCount++;
@@ -72,6 +83,18 @@ public class ExcelWriter {
         cell = row.createCell(5);
         cell.setCellValue(aData.getNumberofTime());
 
+        if (rowCount == 1) {
+            cell = row.createCell(7);
+            cell.setCellFormula("SUM(B2:B201) / " + 200);
+            cell = row.createCell(8);
+            cell.setCellFormula("SUM(C2:C201) / " + 200);
+            cell = row.createCell(9);
+            cell.setCellFormula("SUM(D2:D201) / " + 200);
+            cell = row.createCell(10);
+            cell.setCellFormula("SUM(E2:E201) / " + 200);
+            cell = row.createCell(11);
+            cell.setCellFormula("SUM(F2:F201) / " + 200);
+        }
 
     }
 
